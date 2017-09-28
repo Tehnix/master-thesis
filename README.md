@@ -15,6 +15,6 @@ As such, the preliminary outline of the work will look like,
 5. Evaluation of the implementation both technical and practical
 6. Discussion and further work based on the evaluation
 
-A much more detailed discussion can be found in the _Justification_ section in the [thesis project description](https://raw.githubusercontent.com/Tehnix/master-thesis/master/Appendix/Thesis%20Project%20Description.pdf).
+A much more detailed discussion can be found in the _Justification_ section in the [thesis project description](https://github.com/Tehnix/master-thesis/blob/master/Appendix/Thesis%20Project%20Description.pdf).
 
 <a name="footnote1">1</a> http://keera.co.uk/
