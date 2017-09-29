@@ -1,0 +1,652 @@
+---
+references:
+- id: Haskell-lang.org2017
+  type: no-type
+  author:
+  - family: Haskell-lang.org
+  issued:
+  - year: '2017'
+  accessed:
+  - year: '2017'
+    month: '9'
+    day: '27'
+  title: '[Haskell: An advanced purely-functional programming language]{.nocase}'
+  URL: https://haskell-lang.org/
+
+- id: Milewski2014
+  type: no-type
+  author:
+  - family: Milewski
+    given: Bartosz
+  issued:
+  - year: '2014'
+  accessed:
+  - year: '2017'
+    month: '9'
+    day: '27'
+  title: '[3. Pure Functions, Laziness, I/O, and Monads]{.nocase}'
+  URL: https://www.schoolofhaskell.com/school/starting-with-haskell/basics-of-haskell/3-pure-functions-laziness-io
+
+- id: Bois2005
+  type: article-journal
+  author:
+  - family: Bois
+    given: Ar Du
+  - family: Trinder
+    given: Phil
+  issued:
+  - year: '2005'
+  title: '[mHaskell: Mobile computation in a purely functional language]{.nocase}'
+  container-title: Journal of Universal Computer Science
+  URL: http://www.jucs.org/jucs{\_}11{\_}7/.../jucs{\_}11{\_}7{\_}1234{\_}1254{\_}dubois.html;internal{\&}action=noaction{\&}Parameter=1294952146346
+  ISSN: 0958695X
+
+- id: Huang2012
+  type: article-journal
+  author:
+  - family: Huang
+    given: Junxian
+  - family: Quian
+    given: Feng
+  - family: Gerber
+    given: Alexandre
+  - family: Mao
+    given: Z. Morley
+  - family: Sen
+    given: Subhabrata
+  - family: Spatscheck
+    given: Oliver
+  issued:
+  - year: '2012'
+  title: '[A Close Examination of Performance and Power Characteristics of 4G LTE
+    Networks]{.nocase}'
+  container-title: MobiSys
+  page: '225-238'
+  abstract: With the recent advent of 4G LTE networks, there has been increasing interest
+    to better understand the performance and power characteristics, compared with
+    3G/WiFi networks. In this paper, we take one of the first steps in this direction.
+    Using a publicly deployed tool we designed for Android called 4GTest attracting
+    more than 3000 users within 2 months and extensive local experiments, we study
+    the network performance of LTE networks and compare with other types of mobile
+    networks. We observe LTE generally has significantly higher downlink and uplink
+    throughput than 3G and even WiFi, with a median value of 13Mbps and 6Mbps, respectively.
+    We develop the first empirically derived comprehensive power model of a commercial
+    LTE network with less than 6% error rate and state transitions matching the specifications.
+    Using a comprehensive data set consisting of 5-month traces of 20 smartphone users,
+    we carefully investigate the energy usage in 3G, LTE, and WiFi networks and evaluate
+    the impact of configuring LTE-related parameters. Despite several new power saving
+    improvements, we find that LTE is as much as 23 times less power efficient compared
+    with WiFi, and even less power efficient than 3G, based on the user traces and
+    the long high power tail is found to be a key contributor. In addition, we perform
+    case studies of several popular applications on Android in LTE and identify that
+    the performance bottleneck for web-based applications lies less in the network,
+    compared to our previous study in 3G \[24\]. Instead, the device’s processing
+    power, despite the significant improvement compared to our analysis two years
+    ago, becomes more of a bottleneck.
+  keyword: 3g,4g,4gtest,all or part of,energy saving,lte,net-,or hard copies of,permission
+    to make digital,power model simulation,this work for,work model simulation
+  DOI: 10.1145/2307636.2307658
+  ISBN: '9781450313018'
+
+- id: Freeman
+  type: article-journal
+  author:
+  - family: Freeman
+    given: Phil
+  title: '[PureScript by Example Functional Programming for the Web]{.nocase}'
+
+- id: Benedetto2017
+  type: article-journal
+  author:
+  - family: Benedetto
+    given: Jose I.
+  - family: Neyem
+    given: Andres
+  - family: Navon
+    given: Jaime
+  - family: Valenzuela
+    given: Guillermo
+  issued:
+  - year: '2017'
+  title: '[Rethinking the Mobile Code Offloading Paradigm: From Concept to Practice]{.nocase}'
+  container-title: Proceedings - 2017 IEEE/ACM 4th International Conference on Mobile
+    Software Engineering and Systems, MOBILESoft 2017
+  page: '63-67'
+  keyword: Cloud-Based Mobile Augmentation,Mobile Cloud Computing,Mobile Cloud-Based
+    Systems,Mobile Code Offloading,Software Defined Networks
+  DOI: 10.1109/MOBILESoft.2017.20
+  ISBN: '9781538626696'
+
+- id: Siekkinen2013
+  type: article-journal
+  author:
+  - family: Siekkinen
+    given: Matti
+  - family: Ashraful
+    given: Mohammad
+  - family: Nurminen
+    given: Jukka K
+  - family: Aalto
+    given: M
+  issued:
+  - year: '2013'
+  title: '[Streaming over 3G and LTE : How to Save Smartphone Energy in Radio Access
+    Network-Friendly Way]{.nocase}'
+  container-title: 5th ACM Workshop on Mobile Video, February 27 - March 01, 2013
+  page: '13-18'
+  abstract: 'Siekkinen, M., Hoque, M.A., Nurminen, J.K. and Aalto, M., 2013, February.
+    Streaming over 3G and LTE: How to save smartphone energy in radio access network-friendly
+    way. In Proceedings of the 5th Workshop on Mobile Video (pp. 13-18). ACM.'
+  keyword: 3g,energy,lte,smartphone,streaming
+  DOI: 10.1145/2457413.2457417
+  ISBN: '9781450318938'
+
+- id: Marlow2014
+  type: article-journal
+  author:
+  - family: Marlow
+    given: Simon
+  - family: Brandy
+    given: Louis
+  - family: Coens
+    given: Jonathan
+  - family: Purdy
+    given: Jon
+  issued:
+  - year: '2014'
+  title: '[There is no Fork: an Abstraction for Efficient , Concurrent , and Concise
+    Data Access]{.nocase}'
+  container-title: ICFP ’14 Proceedings of the 19th ACM SIGPLAN international conference
+    on Functional programming
+  page: '325-337'
+  issue: Section 9
+  abstract: 'We describe a new programming idiom for concurrency, based on Applicative
+    Functors, where concurrency is implicit in the Applicative &lt;\*&gt; operator.
+    The result is that concurrent programs can be written in a natural applicative
+    style, and they retain a high degree of clarity and modularity while executing
+    with maximal concur- rency. This idiom is particularly useful for programming
+    against external data sources, where the application code is written without the
+    use of explicit concurrency constructs, while the implementa- tion is able to
+    batch together multiple requests for data from the same source, and fetch data
+    from multiple sources concurrently. Our abstraction uses a cache to ensure that
+    multiple requests for the same data return the same result, which frees the programmer
+    from having to arrange to fetch data only once, which in turn leads to greater
+    modularity. While it is generally applicable, our technique was designed with
+    a particular application in mind: an internal service at Facebook that identifies
+    particular types of content and takes actions based on it. Our application has
+    a large body of business logic that fetches data from several different external
+    sources. The framework described in this paper enables the business logic to execute
+    efficiently by automatically fetching data concurrently; we present some preliminary
+    results.'
+  keyword: applicative,concurrency,data-fetching,haskell,monad
+  DOI: 10.1145/2628136.2628144
+  ISBN: '9781450328739'
+  ISSN: '15232867'
+
+- id: Cuervo2010
+  type: article-journal
+  author:
+  - family: Cuervo
+    given: Eduardo
+  - family: Balasubramanian
+    given: Aruna
+  - family: Cho
+    given: Dae-ki
+  - family: Wolman
+    given: Alec
+  - family: Saroiu
+    given: Stefan
+  - family: Chandra
+    given: Ranveer
+  - family: Bahl
+    given: Paramvir
+  issued:
+  - year: '2010'
+  title: '[MAUI: Making Smartphones Last Longer with Code Offload]{.nocase}'
+  container-title: MobiSys’10
+  page: '49-62'
+  volume: '17'
+  abstract: 'This paper presents MAUI, a system that enables fine-grained energy-aware
+    offload of mobile code to the infrastructure. Previous approaches to these problems
+    either relied heavily on programmer support to partition an application, or they
+    were coarse-grained re- quiring full process (or full VM) migration. MAUI uses
+    the benefits of a managed code environment to offer the best of both worlds: it
+    supports fine-grained code offload to maximize energy savings with minimal burden
+    on the programmer. MAUI decides at run- time which methods should be remotely
+    executed, driven by an op- timization engine that achieves the best energy savings
+    possible un- der the mobile devices current connectivity constrains. In our eval-
+    uation, we show that MAUI enables: 1) a resource-intensive face recognition application
+    that consumes an order of magnitude less energy, 2) a latency-sensitive arcade
+    game application that doubles its refresh rate, and 3) a voice-based language
+    translation applica- tion that bypasses the limitations of the smartphone environment
+    by executing unsupported components remotely.'
+  keyword: code offload,energy management,partitioning,smartphones
+  URL: http://dl.acm.org/citation.cfm?id=1814441
+  DOI: 10.1145/1814433.1814441
+  ISBN: '9781605589855'
+  ISSN: '10058885'
+
+- id: Liu2016
+  type: article-journal
+  author:
+  - family: Liu
+    given: Dong
+  - family: Chen
+    given: Binqiang
+  - family: Yang
+    given: Chenyang
+  - family: Molisch
+    given: Andreas F.
+  issued:
+  - year: '2016'
+  title: '[Caching at the wireless edge: Design aspects, challenges, and future
+    directions]{.nocase}'
+  container-title: IEEE Communications Magazine
+  page: '22-28'
+  volume: '54'
+  issue: '9'
+  abstract: Caching at the wireless edge is a promising way to boost spectral efficiency
+    and reduce energy consumption of wireless systems. These improvements are rooted
+    in the fact that popular contents are reused, asynchronously, by many users. In
+    this article we first introduce methods to predict the popularity distributions
+    and user preferences, and the impact of erroneous information. We then discuss
+    the two aspects of caching systems, content placement and delivery. We expound
+    the key differences between wired and wireless caching, and outline the differences
+    in the system arising from where the caching takes place (e.g., at base stations
+    or on the wireless devices themselves). Special attention is paid to the essential
+    limitations in wireless caching, and possible trade-offs between spectral efficiency,
+    energy efficiency, and cache size. 2016 IEEE.
+  DOI: 10.1109/MCOM.2016.7565183
+  ISSN: '01636804'
+
+- id: Rosen2015
+  type: article-journal
+  author:
+  - family: Rosen
+    given: Sanae
+  - family: Nikravesh
+    given: Ashkan
+  - family: Guo
+    given: Yihua
+  - family: Mao
+    given: Z Morley
+  - family: Qian
+    given: Feng
+  - family: Sen
+    given: Subhabrata
+  issued:
+  - year: '2015'
+  title: '[Revisiting Network Energy Efficiency of Mobile Apps : Performance in
+    the Wild]{.nocase}'
+  container-title: HotMobile ’15
+  page: '339-345'
+  abstract: Energy consumption due to network traffic on mobile devices continues
+    to be a significant concern. We examine a range of excessive energy consumption
+    problems caused by background network traffic through a two-year user study, and
+    also validate these findings through in-lab testing of the most recent versions
+    of major mobile apps. We discover a new energy consumption problem where foreground
+    network traffic persists after switching from the foreground to the background,
+    leading to unnecessary energy and data drain. Furthermore, while we find some
+    apps have taken steps to improve the energy impact of periodic background traffic,
+    energy consumption differences of up to an order of magnitude exist between apps
+    with near-identical functionality. Finally, by examining how apps are used in
+    the wild, we find that some apps continue to generate unneeded traffic for days
+    when the app is not being used, and in some cases this wasted traffic is responsible
+    for a majority of the app’s network energy overhead. We propose that these persistent,
+    widespread and varied sources of excessive energy consumption in popular apps
+    should be addressed through new app management tools that tailor network activity
+    to user interaction patterns. 2015 ACM.
+  keyword: 4g lte,cellular network performance,mobile en-,smartphones
+  DOI: 10.1145/2815675.2815713
+  ISBN: '9781450338486'
+
+- id: Takenobu2015
+  type: article-journal
+  author:
+  - family: Takenobu
+    given: T.
+  issued:
+  - year: '2015'
+  title: '[GHC illustrated]{.nocase}'
+
+- id: Cui2014
+  type: article-journal
+  author:
+  - family: Cui
+    given: 'Y'
+  - family: Xiao
+    given: S
+  - family: Wang
+    given: X
+  - family: Li
+    given: M
+  - family: Wang
+    given: H
+  - family: Lai
+    given: Z
+  issued:
+  - year: '2014'
+  title: '[Performance-aware energy optimization on mobile devices in cellular network]{.nocase}'
+  container-title: 33rd IEEE Conference on Computer Communications, IEEE INFOCOM 2014
+  page: '1123-1131'
+  volume: '16'
+  issue: '4'
+  abstract: In cellular networks, it is important to conserve energy while at the
+    same time ensuring users to have good transmission experiences. The energy cost
+    can result from tail energy due to the radio resource control strategies designed
+    in cellular networks and data transmission. Existing efforts generally consider
+    one of the energy issues, and also ignore the adverse impact on user transmission
+    performance due to energy conservation. In addition, many existing algorithms
+    are based on prediction and knowledge on future traffic, which are hard to apply
+    in a practical wireless system with dynamic user traffic and channel condition.
+    The goal of this work is to design an efficient online scheduling algorithm to
+    minimize energy consumption both due to tail energy and transmissions while meeting
+    user performance expectation. We prove the problem to be NP-hard, and design a
+    practical online scheduling algorithm PerES to minimize the total energy cost
+    of multiple mobile applications subject to user performance constraints. We propose
+    a comprehensive performance cost metric to capture the impacts due to task delay,
+    deadline violation, different application profiles and user preferences. We prove
+    that our proposed scheduling algorithm can make the energy consumption arbitrarily
+    close to that of the optimal scheduling solution. The evaluation results demonstrate
+    the effectiveness of our scheme and its higher performance than peers. Moreover,
+    by supporting dynamic performance requirement by mobile users, PerES can achieve
+    2 times faster convergence to both the performance degradation bound and optimal
+    energy conversation bound than those of traditional static methods. Using 821
+    million traffic flows collected from a commercial cellular carrier, we verify
+    our scheme could achieve on average 32%-56% energy savings with different levels
+    of user experience. 2014 IEEE.
+  keyword: Comprehensive performance,Costs,Dynamic performance,Energy conservation,Energy
+    optimization,Energy utilization,Mobile applications,Mobile devices,Mobile telecommunication
+    systems,Online scheduling algorithm,Optimization,Performance degradation,Radio
+    resource control,Scheduling,Scheduling algorithms,Transmission performance,User
+    interfaces
+  URL: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84904430663{\&}partnerID=40{\&}md5=b465b2f3a7f68489d8fa63ea779678d2
+  DOI: 10.1109/INFOCOM.2014.6848043
+  ISBN: 0743166X (ISSN); 9781479933600 (ISBN)
+
+- id: Golkarifard2017
+  type: article-journal
+  author:
+  - family: Golkarifard
+    given: Morteza
+  - family: Yang
+    given: Ji
+  - family: Movaghar
+    given: Ali
+  - family: Hui
+    given: Pan
+  issued:
+  - year: '2017'
+  title: '[A Hitchhiker’s guide to computation offloading: Opinions from practitioners]{.nocase}'
+  container-title: IEEE Communications Magazine
+  page: '193-199'
+  volume: '55'
+  issue: '7'
+  DOI: 10.1109/MCOM.2017.1600481
+  ISSN: '01636804'
+
+- id: Flores2013
+  type: article-journal
+  author:
+  - family: Flores
+    given: Huber
+  - family: Srirama
+    given: Satish
+  issued:
+  - year: '2013'
+  title: '[Mobile code offloading: should it be a local decision or global inference?]{.nocase}'
+  container-title: Proceeding of the 11th annual international conference on Mobile
+    systems, applications, and services
+  page: '539-540'
+  abstract: 'My Summary: The idea of this paper is over the offloading consider
+    all state of computing environment (based on log analisis in clusters) instead
+    of mobile device observation. unlike other approaches, we think that o oad-ing
+    is not a local decision process that happens just within the device’s context,
+    but rather o oading is a learning pro-cess that involves a global understanding
+    of the infrastruc-ture.'
+  keyword: Cloud computing,code offloading,machine learning,mobile cloud,mobile computing
+  URL: http://doi.acm.org/10.1145/2462456.2465722
+  DOI: 10.1145/2462456.2465722
+  ISBN: '978-1-4503-1672-9'
+
+- id: Paykin2017
+  type: article-journal
+  author:
+  - family: Paykin
+    given: Jennifer
+  - family: Zdancewic
+    given: Steve
+  issued:
+  - year: '2017'
+  title: The Linearity Monad
+  page: '117-132'
+  volume: '1'
+  issue: '1'
+  keyword: 2017,acm reference format,ceedings of 10th acm,haskell,in pro-,jennifer
+    paykin and steve,linear,monads,non-linear logic,oxford,sigplan international haskell
+    symposium,the linearity monad,zdancewic
+  ISBN: '9781450351829'
+
+- id: Panwar2016
+  type: article-journal
+  author:
+  - family: Panwar
+    given: Nisha
+  - family: Sharma
+    given: Shantanu
+  - family: Singh
+    given: Awadhesh Kumar
+  issued:
+  - year: '2016'
+  title: '[A survey on 5G: The next generation of mobile communication]{.nocase}'
+  container-title: Physical Communication
+  page: '64-84'
+  volume: '18'
+  abstract: 'The rapidly increasing number of mobile devices, voluminous data, and
+    higher data rate are pushing to rethink the current generation of the cellular
+    mobile communication. The next or fifth generation (5G) cellular networks are
+    expected to meet high-end requirements. The 5G networks are broadly characterized
+    by three unique features: ubiquitous connectivity, extremely low latency, and
+    very high-speed data transfer. The 5G networks would provide novel architectures
+    and technologies beyond state-of-the-art architectures and technologies. In this
+    paper, our intent is to find an answer to the question: “what will be done by
+    5G and how?” We investigate and discuss serious limitations of the fourth generation
+    (4G) cellular networks and corresponding new features of 5G networks. We identify
+    challenges in 5G networks, new technologies for 5G networks, and present a comparative
+    study of the proposed architectures that can be categorized on the basis of energy-efficiency,
+    network hierarchy, and network types. Interestingly, the implementation issues,
+    e.g., interference, QoS, handoff, security-privacy, channel access, and load balancing,
+    hugely effect the realization of 5G networks. Furthermore, our illustrations highlight
+    the feasibility of these models through an evaluation of existing real-experiments
+    and testbeds.'
+  keyword: Cloud radio access networks,Cognitive radio networks,D2D communication,Dense
+    deployment,Multi-tier heterogeneous network,Tactile Internet
+  DOI: 10.1016/j.phycom.2015.10.006
+  ISSN: '18744907'
+
+- id: Bernardy2010
+  type: article-journal
+  author:
+  - family: Bernardy
+    given: Jean-Philippe
+  - family: Boespflug
+    given: Mathieu
+  - family: Newton
+    given: Ryan R
+  - family: Jones
+    given: Simon Peyton
+  issued:
+  - year: '2010'
+  title: Retrofitting Linear Types
+  container-title: PACM Progr. Lang. Article
+  volume: '9'
+  issue: '39'
+  abstract: 'Linear and affine type systems have a long and storied history, but
+    not a clear path forward to integrate with existing languages such as Ocaml or
+    Haskell. In this paper, we introduce and study a linear type system designed with
+    two crucial properties in mind: backwards-compatibility and code reuse across
+    linear and non-linear users of a library. Only then can the benefits of linear
+    types permeate conventional functional programming. Rather than bifurcate data
+    types into linear and non-linear counterparts, we instead attach linearity to
+    binders. Linear function types can receive inputs from linearly-bound values,
+    but can also operate over unrestricted, regular values. Linear types are an enabling
+    tool for safe and resource efficient systems programming. We explore the power
+    of linear types with a case study of a large, in-memory data structures that must
+    serve responses with low latency.'
+  DOI: 10.1145/nnnnnnn.nnnnnnn
+  ISBN: '9781450335492'
+  ISSN: '15232867'
+
+- id: Lin2014
+  type: article-journal
+  author:
+  - family: Lin
+    given: Chit-kwan
+  issued:
+  - year: '2014'
+  title: '[Mobile App Acceleration via Fine-Grain Offloading to the Cloud]{.nocase}'
+  container-title: 6th USENIX Workshop on Hot Topics in Cloud Computing
+  abstract: Mobile device hardware can limit the sophistication$\backslash$nof mobile
+    applications. One strategy for$\backslash$nside-stepping these constraints is
+    to$\backslash$nopportunistically offload computations to the cloud,$\backslash$nwhere
+    more capable hardware can do the heavy$\backslash$nlifting. We propose a platform
+    that accomplishes$\backslash$nthis via compressive offloading, a novel application$\backslash$nof
+    compressive sensing in a distributed shared$\backslash$nmemory setting. Our prototype
+    gives up to an$\backslash$norder-of-magnitude acceleration and 60% longer$\backslash$nbattery
+    life to the end user of an example$\backslash$nhandwriting recognition app. We
+    argue that$\backslash$noffloading is beneficial to both end users and cloud$\backslash$nproviders—the
+    former experiences a performance boost$\backslash$nand the latter receives a steady
+    stream of small$\backslash$ncomputations to fill periods of$\backslash$nunder-utilization.
+    Such workloads, originating from$\backslash$nARM-based mobile devices, are especially
+    well-suited$\backslash$nfor offloading to emerging ARM-based data centers.
+
+- id: Jiao2013
+  type: article-journal
+  author:
+  - family: Jiao
+    given: Lei
+  - family: Friedman
+    given: Roy
+  - family: Fu
+    given: Xiaoming
+  issued:
+  - year: '2013'
+  title: '[Cloud-based computation offloading for mobile devices: State of the art,
+    challenges and opportunities]{.nocase}'
+  container-title: Future Network and Mobile Summit (FutureNetworkSummit)
+  page: '1-11'
+  abstract: Mobile cloud computing is a new rapidly growing field. In addition to
+    the conventional fashion that mobile clients access cloud services as in the well-known
+    client/server model, existing work has proposed to explore cloud functionalities
+    in another perspective - offloading part of the mobile codes to the cloud for
+    remote execution in order to optimize the application performance and energy efficiency
+    of the mobile device. In this position paper, we investigate the state of the
+    art of code offloading for mobile devices, highlight the significant challenges
+    towards a more efficient cloud-based offloading framework, and also point out
+    how existing technologies can provide us opportunities to facilitate the framework
+    implementation.
+  URL: http://ieeexplore.ieee.org/xpls/abs{\_}all.jsp?arnumber=6633526
+  ISBN: '9781905824'
+
+- id: Vallina-rodriguez2012
+  type: article-journal
+  author:
+  - family: Vallina-rodriguez
+    given: Narseo
+  - family: Crowcroft
+    given: Jon
+  issued:
+  - year: '2012'
+  title: Modern Mobile Handsets
+  container-title: Context
+  page: '1-20'
+  volume: '15'
+  issue: '1'
+
+- id: Nabi2015
+  type: article-journal
+  author:
+  - family: Nabi
+    given: T
+  - family: Mittal
+    given: P
+  - family: Azimi
+    given: P
+  - family: Dig
+    given: D
+  - family: Tilevich
+    given: E
+  issued:
+  - year: '2015'
+  title: '[Assessing the benefits of computational offloading in mobile-cloud applications]{.nocase}'
+  container-title: MobileDeLi 2015 - Proceedings of the 3rd International Workshop
+    on Mobile Development Lifecycle
+  page: '17-24'
+  abstract: 'This paper presents the results of a formative study conducted to determine
+    the effects of computation offloading in mobile applications by comparing application
+    performance (chiefly energy consumption and response time). The study examined
+    two general execution scenarios: (1) computation is performed locally on a mobile
+    device, and (2) computation is offloaded entirely to the cloud. The study also
+    carefully considered the underlying network characteristics as an important factor
+    affecting the performance. More specifically, we refactored two mobile applications
+    to offload their computationally intensive functionality to execute in the cloud.
+    We then profiled these applications under different network conditions, and carefully
+    measured application performance in each case. The results indicate that on fast
+    networks, offloading is almost always beneficial. However, on slower networks,
+    the offloading cost-benefit analysis is not as clear cut. The characteristics
+    of the data transferred between the mobile device and the cloud may be a deciding
+    factor in determining whether computation offloading would improve performance.
+    2015 ACM.'
+  keyword: Cloud offloading,Energy efficiency,Execution performance,Mobile applications
+  URL: https://www.scopus.com/inward/record.uri?eid=2-s2.0-84964228173{\&}partnerID=40{\&}md5=293caae9f4f94eb2433a5292c2a06ba1
+  DOI: 10.1145/2846661.2846663
+  ISBN: '978-1-4503-3906-3'
+
+- id: Gupta2013
+  type: article-journal
+  author:
+  - family: Gupta
+    given: M.
+  - family: Jha
+    given: S.C.
+  - family: Koc
+    given: A.T.
+  - family: Vannithamby
+    given: R.
+  issued:
+  - year: '2013'
+  title: '[Energy impact of emerging mobile internet applications on LTE networks:
+    issues and solutions]{.nocase}'
+  container-title: IEEE Communications Magazine
+  page: 90 -97
+  volume: '51'
+  issue: '2'
+  abstract: Mobile Internet applications run on devices such as smartphones and tablets,
+    and have dramatically changed the landscape of applicationgenerated network traffic.
+    The potent combination of millions of such applications and the instant accessibility
+    of high-speed Internet on mobile devices through 3G and now LTE technology has
+    also changed how users themselves interact with the Internet. Specifically, the
+    radio states in LTE such as RRC\_Connected and RRC\_Idle were designed with more
+    traditional applications such as web browsing and FTP in mind. These traditional
+    applications typically generated traffic only during Active (Connected) state,
+    and once the user session ended, usually the traffic ended too, thus allowing
+    the radio to move to Inactive (Idle) state. However, newer applications such as
+    Facebook and Twitter generate a constant stream of autonomous and/or user generated
+    traffic at all times, thus erasing the previously clear demarcation between Active
+    and Inactive states. This means a given mobile device (or user equipment, in LTE
+    parlance) often ends up moving between Connected and Idle states frequently to
+    send mostly short bursts of data, draining device battery and causing excessive
+    signaling overhead in LTE networks. This problem has grown and attracted the research
+    community’s attention to address the negative effects of frequent back and forth
+    transitions between LTE radio states. In this article, we first explore the traffic
+    characteristics of these emerging mobile Internet applications and how they differ
+    from more traditional applications. We investigate their impact on LTE device
+    power and air interface signaling. We then present a survey of state-of-the-art
+    solutions proposed in literature to address the problems, and analyze their merits
+    and demerits. Lastly, we discuss the solutions adopted by 3GPP including the latest
+    developments in Release 11 to handle these issues, and present potential future
+    research directions in this field.
+  URL: http://ieeexplore.ieee.org/ielx5/35/6461169/06461191.pdf?tp={\&}arnumber=6461191{\&}isnumber=6461169{\%}5Cnhttp://ieeexplore.ieee.org/xpls/abs{\_}all.jsp?arnumber=6461191
+  DOI: 10.1109/MCOM.2013.6461191
+  ISSN: '0163-6804'
+...

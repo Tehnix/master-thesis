@@ -18,3 +18,12 @@ As such, the preliminary outline of the work will look like,
 A much more detailed discussion can be found in the _Justification_ section in the [thesis project description](https://github.com/Tehnix/master-thesis/blob/master/Appendix/Thesis%20Project%20Description.pdf).
 
 <a name="footnote1">1</a> http://keera.co.uk/
+
+
+# Miscelleanuous
+
+## Generating yaml format bibliography
+
+```shell
+pandoc-citeproc --bib2yaml Bibliography.bib > Bibliography.yaml
+```

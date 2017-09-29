@@ -1,0 +1,44 @@
+---
+title: |
+  Exploring the use of purely functional programming languages for offloading of mobile computations
+subtitle: false
+author:
+- Christian Kjaer Laustsen
+- s124324 @ DTU
+- 20176018 @ KAIST
+date: 2017-01-28
+tags: [mobile computation, offloading, haskell, dtu, kaist]
+thesis:
+  abbreviation: M.Sc.
+  type: Master of Science in Engineering
+  location: Kongens Lyngby
+  todos: false
+  confidential: false
+  colophon: true
+  institute: DTU Fotonik
+  institute-longname: Department of Photonics Engineering
+  university: Technical University of Denmark
+  address:
+    - Ørsteds Plads
+    - Building 343
+    - 2800 Kongens Lyngby, Denmark
+    - Phone +45 4525 6352
+    - info@fotonik.dtu.dk
+    - www.fotonik.dtu.dk
+abstract: |
+  This is the abstract.
+
+  It consists of two paragraphs.
+
+# Latex specific variables.
+documentclass: memoir
+fontsize: 12pt
+graphics: true
+table-of-contents: true
+toc-depth: 3
+number-sections: true
+highlight-style: pygments
+biblio-title: Bibliography
+bibliography: Bibliography/Bibliography.bib
+biblatex: true
+...
