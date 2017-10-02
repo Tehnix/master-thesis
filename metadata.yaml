@@ -1,4 +1,16 @@
 ---
+# Latex specific variables.
+documentclass: memoir
+fontsize: 10pt
+graphics: true
+toc: true
+toc-depth: 1
+number-sections: true
+highlight-style: pygments
+biblio-title: Bibliography
+bibliography: Bibliography/Bibliography.bib
+biblatex: true
+# Content specific variables.
 title: |
   Exploring the use of purely functional programming languages for offloading of mobile computations
 subtitle: false
@@ -8,6 +20,10 @@ author:
 - 20176018 @ KAIST
 date: 2017-01-28
 tags: [mobile computation, offloading, haskell, dtu, kaist]
+abstract: |
+  This is the abstract.
+
+  It consists of two paragraphs.
 thesis:
   abbreviation: M.Sc.
   type: Master of Science in Engineering
@@ -25,20 +41,4 @@ thesis:
     - Phone +45 4525 6352
     - info@fotonik.dtu.dk
     - www.fotonik.dtu.dk
-abstract: |
-  This is the abstract.
-
-  It consists of two paragraphs.
-
-# Latex specific variables.
-documentclass: memoir
-fontsize: 12pt
-graphics: true
-table-of-contents: true
-toc-depth: 3
-number-sections: true
-highlight-style: pygments
-biblio-title: Bibliography
-bibliography: Bibliography/Bibliography.bib
-biblatex: true
 ...
