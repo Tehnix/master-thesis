@@ -1,0 +1,20 @@
+name:                FreeFun
+version:             0.1.0.0
+#synopsis:
+#description:
+homepage:            https://github.com/Tehnix/FreeFun#readme
+license:             BSD3
+author:              Christian Kjaer Laustsen
+maintainer:          ckl@codetalk.io
+copyright:           Christian Kjaer Laustsen
+category:            Miscellaneous
+extra-source-files:
+- README.md
+
+dependencies:
+  - base >= 4.7 && < 5
+
+executables:
+  FreeFun:
+    source-dirs:      src
+    main:             Main.hs

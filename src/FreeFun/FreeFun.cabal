@@ -1,0 +1,30 @@
+-- This file has been generated from package.yaml by hpack version 0.20.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 07eee5aa401df6f147a42d3839d2826f6632db1d4a871dd0310995f34df77f5f
+
+name:           FreeFun
+version:        0.1.0.0
+category:       Miscellaneous
+homepage:       https://github.com/Tehnix/FreeFun#readme
+author:         Christian Kjaer Laustsen
+maintainer:     ckl@codetalk.io
+copyright:      Christian Kjaer Laustsen
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+cabal-version:  >= 1.10
+
+extra-source-files:
+    README.md
+
+executable FreeFun
+  main-is: Main.hs
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+  other-modules:
+      Paths_FreeFun
+  default-language: Haskell2010
