@@ -2,6 +2,10 @@ $for(header-includes)$
   $header-includes$
 $endfor$
 
+$if(loa)$
+\makeglossaries
+\input{Bibliography/Acronyms.tex}
+$endif$
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Document beginning.
 \begin{document}
@@ -19,9 +23,23 @@ $if(thesis.colophon)$
 \cleartooddpage
 $endif$
 
+\frontmatter
+% \pagenumbering{roman}
+% \setcounter{page}{1}
+
 $if(abstract)$
-\chapter{Abstract}
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+\setcounter{chapter}{0}
 $abstract$
+\clearforchapter
+$endif$
+
+$if(preface)$
+\chapter*{Preface}
+\addcontentsline{toc}{chapter}{Preface}
+\setcounter{chapter}{0}
+$preface$
 \clearforchapter
 $endif$
 
@@ -40,16 +58,24 @@ $endif$
 \setcounter{tocdepth}{$toc-depth$}
 \tableofcontents
 }
+\clearforchapter
 $endif$
 
 % List of tables.
 $if(lot)$
 \listoftables
+\clearforchapter
 $endif$
 
 % List of figures.
 $if(lof)$
 \listoffigures
+\clearforchapter
+$endif$
+
+$if(loa)$
+%\printglossary[type=\acronymtype]
+%\clearforchapter
 $endif$
 
 % The actual content of the document.
@@ -57,23 +83,24 @@ $endif$
 $body$
 
 % Bibliography.
+\backmatter
 $if(natbib)$
-$if(bibliography)$
-$if(biblio-title)$
-$if(book-class)$
-\renewcommand\bibname{$biblio-title$}
-$else$
-\renewcommand\refname{$biblio-title$}
-$endif$
-$endif$
-\bibliography{$for(bibliography)$$bibliography$$sep$,$endfor$}
+  $if(bibliography)$
+  $if(biblio-title)$
+  $if(book-class)$
+  \renewcommand\bibname{$biblio-title$}
+  $else$
+  \renewcommand\refname{$biblio-title$}
+  $endif$
+  $endif$
+  \bibliography{$for(bibliography)$$bibliography$$sep$,$endfor$}
 
-$endif$
+  $endif$
 $endif$
 
 % Printing the Bibliography if biblatex.
 $if(biblatex)$
-\printbibliography$if(biblio-title)$[title=$biblio-title$]$endif$
+\printbibliography$if(biblio-title)$[heading=bibintoc,title={$biblio-title$}]$endif$
 
 $endif$
 

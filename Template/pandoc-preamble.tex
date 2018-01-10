@@ -223,7 +223,12 @@ $if(natbib)$
 $endif$
 
 $if(biblatex)$
-\usepackage[$if(biblio-style)$style=$biblio-style$,$endif$$for(biblatexoptions)$$biblatexoptions$$sep$,$endfor$]{biblatex}
+\usepackage[backend=biber,
+            % alldates=long,
+            % backref=true,
+            % abbreviate=false,
+            % dateabbrev=false,
+            style=alphabetic]{biblatex}
 $for(bibliography)$
 \addbibresource{$bibliography$}
 $endfor$
@@ -325,3 +330,14 @@ $endif$
 \makeatletter
 \def\fps@figure{htbp}
 \makeatother
+
+\usepackage{longtable}
+\usepackage{caption}
+\captionsetup[table]{position=bottom}
+
+$if(loa)$
+\usepackage[acronym, toc]{glossaries}
+$endif$
+
+\usepackage{verbatim}
+\usepackage{cleveref}

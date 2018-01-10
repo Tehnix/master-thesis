@@ -94,7 +94,12 @@ offloading of mobile computations}
 
 
 
-\usepackage[]{biblatex}
+\usepackage[backend=biber,
+            % alldates=long,
+            % backref=true,
+            % abbreviate=false,
+            % dateabbrev=false,
+            style=alphabetic]{biblatex}
 \addbibresource{Bibliography/Bibliography.bib}
 
 
@@ -141,3 +146,12 @@ offloading of mobile computations}
 \makeatletter
 \def\fps@figure{htbp}
 \makeatother
+
+\usepackage{longtable}
+\usepackage{caption}
+\captionsetup[table]{position=bottom}
+
+\usepackage[acronym, toc]{glossaries}
+
+\usepackage{verbatim}
+\usepackage{cleveref}

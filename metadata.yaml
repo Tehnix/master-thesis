@@ -6,10 +6,14 @@ graphics: true
 toc: true
 toc-depth: 1
 number-sections: true
+loa: true
+lot: true
+lof: true
 highlight-style: pygments
 biblio-title: Bibliography
 bibliography: Bibliography/Bibliography.bib
 biblatex: true
+csl: citation-style.csl
 # Content specific variables.
 title: |
   Exploring the use of purely functional programming languages for offloading of mobile computations
@@ -24,6 +28,10 @@ abstract: |
   This is the abstract.
 
   It consists of two paragraphs.
+
+  Or does it?
+preface: |
+  This thesis was written...
 thesis:
   abbreviation: M.Sc.
   type: Master of Science in Engineering

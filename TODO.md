@@ -25,24 +25,26 @@
 
 
 #### Thesis outline
-- [ ] Introduction
-  - [ ] What are we exploring in this thesis?
-- [ ] The case for offloading
+- [ ] Abstract
+- [x] Introduction
+  - [x] What are we exploring in this thesis?
+  - [x] Why is it new?
+- [ ] The case for offloading <-- meta analysis
   - [ ] Why would we want to do it?
   - [ ] Can it actually save energy?
-- [ ] When to offload
-  - [ ] What network conditions?
-  - [ ] What about input/output size?
-- [ ] Briefly on pure functional programming languages
-  - [ ] Generally on purity and functional programming
-  - [ ] Primer on Haskell
-  - [ ] Lazy vs Strict evaluation
+  - [ ] When to offload
+    - [ ] What network conditions?
+    - [ ] What about input/output size?
 - [ ] Related Work
   - [ ] Read through whitepapers and write down notes to include in this chapter
   - [ ] MAUI
   - [ ] CloneCloud
   - [ ] Other systems?
   - [ ] Play around with Haxl
+- [ ] Purely functional programming
+  - [ ] Purity and functional programming (Haskell, PureScript, Idris, Elm, etc)
+  - [ ] Lazy vs Strict evaluation
+  - [ ] Primer on Haskell
 - [ ] Approaches to offloading (with Haskell in mind)
   - [ ] Extending the runtime
   - [ ] Mondic framework (MTL-style/Free/Freer) (à la `Haxl` maybe, going beyond)
