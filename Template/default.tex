@@ -78,6 +78,13 @@ $if(loa)$
 %\clearforchapter
 $endif$
 
+$if(lol)$
+\listoflistings
+\markboth{List of Listings}{}
+\addcontentsline{toc}{chapter}{List of Listings}
+\clearforchapter
+$endif$
+
 % The actual content of the document.
 \mainmatter
 $body$

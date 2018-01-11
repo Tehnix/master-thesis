@@ -9,6 +9,7 @@ number-sections: true
 loa: true
 lot: true
 lof: true
+lol: true
 highlight-style: pygments
 codeBlockCaptions: true
 biblio-title: Bibliography
