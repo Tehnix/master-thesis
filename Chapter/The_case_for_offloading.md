@@ -1,4 +1,4 @@
-# The case for offloading {#cha:case_for_offloading}
+# The Case for Offloading {#cha:case_for_offloading}
 
 meta analysis or something
 

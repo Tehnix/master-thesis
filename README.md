@@ -8,22 +8,16 @@ The work will be done in collaboration with my supervisors Henrik Lehrmann Chris
 
 As such, the preliminary outline of the work will look like,
 
-1. Related work
-2. Exploring different approaches
-3. Settle on the most optimal approach to continue with
-4. Implementation of selected approach
-5. Evaluation of the implementation both technical and practical
-6. Discussion and further work based on the evaluation
+- Introduction
+- The Case for Offloading
+- Related work
+- Purely Functional Programming
+- Approaches to Offloading
+- Offloading Using a Monadic Framework
+- Evaluation & Discussion
+- Future Work
+- Conclusion
 
 A much more detailed discussion can be found in the _Justification_ section in the [thesis project description](https://github.com/Tehnix/master-thesis/blob/master/Appendix/Thesis%20Project%20Description.pdf).
 
 <a name="footnote1">1</a> http://keera.co.uk/
-
-
-# Miscelleanuous
-
-## Generating yaml format bibliography
-
-```shell
-pandoc-citeproc --bib2yaml Bibliography.bib > Bibliography.yaml
-```

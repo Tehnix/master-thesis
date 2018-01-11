@@ -10,9 +10,10 @@
 
 
 - [ ] Play around with Free/Freer monads
-  - [ ] http://www.haskellforall.com/2012/06/you-could-have-invented-free-monads.html
-  - [ ] https://joashc.github.io/posts/2016-03-23-free-monads.html
-  - [ ] https://joashc.github.io/posts/2015-09-13-free-monad-steps.html
+  - [x] http://www.haskellforall.com/2012/06/you-could-have-invented-free-monads.html
+  - [x] https://joashc.github.io/posts/2016-03-23-free-monads.html
+  - [x] https://joashc.github.io/posts/2015-09-13-free-monad-steps.html
+  - [ ] Implement a prototype
 
 - [ ] Study up on exisiting literrature
   - [ ] Brush up on H.1 - There is no Fork- an Abstraction for Efficient, Concurrent, and Concise Data Access (Haxl)

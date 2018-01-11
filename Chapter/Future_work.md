@@ -1,1 +1,1 @@
-# Future work {#cha:future_work}
+# Future Work {#cha:future_work}

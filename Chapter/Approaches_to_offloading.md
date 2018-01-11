@@ -1,18 +1,22 @@
-# Approaches to offloading {#cha:approaches}
-
-## Extending the runtime {#sec:approaches_runtime}
+# Approaches to Offloading {#cha:approaches}
 
 
-## Mondic framework (MTL-style/Free/Freer) (à la `Haxl` maybe, going beyond) {#sec:approaches_monadic}
+## Extending the Runtime {#sec:approaches_runtime}
 
 
-## unsafePerformIO {#sec:approaches_unsafe}
+## GHC Compiler/Language Extension {#sec:approaches_extension}
+À la how `ApplicativeDo` reorders computations.
 
 
-## GHC compiler or language extension (à la how `ApplicativeDo` reorders computations) {#sec:approaches_extension}
+## `unsafePerformIO` {#sec:approaches_unsafe}
 
 
-## Pre-process the source (e.q. haskell-src-exts or ghc-exactprint) {#sec:approaches_source}
+## Mondic Framework {#sec:approaches_monadic}
+MTL-style/Free/Freer, maybe look into `Haxl`.
+
+
+## Manipulate the Source {#sec:approaches_source}
+E.q. haskell-src-exts or ghc-exactprint
 
 
 ## Template Haskell {#sec:approaches_template}

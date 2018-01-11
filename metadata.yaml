@@ -10,6 +10,7 @@ loa: true
 lot: true
 lof: true
 highlight-style: pygments
+codeBlockCaptions: true
 biblio-title: Bibliography
 bibliography: Bibliography/Bibliography.bib
 biblatex: true
