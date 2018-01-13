@@ -29,6 +29,66 @@ references:
   title: '[Monad transformers, free monads, mtl, laws and a new approach]{.nocase}'
   URL: https://ocharles.org.uk/blog/posts/2016-01-26-transformers-free-monads-mtl-laws.html
 
+- id: Marlow2006
+  type: article-journal
+  author:
+  - family: Marlow
+    given: Simon
+  - family: Jones
+    given: Simon Peyton
+  issued:
+  - year: '2006'
+  title: '[Making a fast curry: push/enter vs. eval/apply for higher-order languages]{.nocase}'
+  container-title: JFP
+  page: '415-449'
+  volume: '16'
+  issue: '5'
+  abstract: 'Higher-order languages that encourage currying are typically implemented
+    using one of two basic evaluation models: push/enter or eval/apply. Implementors
+    use their intuition and qualitative judgements to choose one model or the other.
+    Our goal in this paper is to provide, for the first time, a more substantial basis
+    for this choice, based on our qualitative and quantitative experience of implementing
+    both models in a state-of-the-art compiler for Haskell. Our conclusion is simple,
+    and contradicts our initial intuition: compiled implementations should use eval/apply.
+    Capsule Review Language implementors are often faced with choices about how to
+    implement a particular language feature. Unfortunately, there is often little
+    empirical evidence to guide us in these choices and we must rely on our, often
+    faulty, intuition. This paper examines the choice between two different implementation
+    techniques for curried function application and provides important guidance to
+    future implementors about this choice. The two techniques are “ push/enter, ”
+    where the callee is responsible for arity matching, and “ eval/apply, ” where
+    the caller is responsible for arity matching. While many people’s intuition might
+    be that “ push/enter ” is more efficient, and thus worth a more complex implementation,
+    this paper shows that, in fact, the two techniques have essentially the same performance
+    on a wide range of Haskell programs. Thus, one concludes that implementors should
+    choose the simpler approach: namely, eval/apply.'
+  URL: http://www.cs.tufts.edu/{~}nr/cs257/archive/simon-peyton-jones/eval-apply-jfp.pdf
+  DOI: 10.1017/S0956796806005995
+
+- id: Brown2012
+  type: article-journal
+  author:
+  - family: Brown
+    given: Amy
+  - family: Wilson
+    given: Greg
+  issued:
+  - year: '2012'
+  title: '[The Architecture of Open Source Applications - Volume I]{.nocase}'
+  page: '388'
+  abstract: This chapter discusses some of the design decisions that shaped LLVM1,
+    an umbrella project that hosts and develops a set of close-knit low-level toolchain
+    components (e.g., assemblers, compilers, debuggers, etc.), which are designed
+    to be compatible with existing tools typically used on Unix systems. The name
+    “LLVM” was once an acronym, but is now just a brand for the umbrella project.
+    While LLVM provides some unique capabilities, and is known for some of its great
+    tools (e.g., the Clang compiler2, a C/C++/Objective-C compiler which provides
+    a number of benefits over the GCC compiler), the main thing that sets LLVM apart
+    from other compilers is its internal architecture.
+  keyword: book,open source
+  URL: http://www.aosabook.org/en/ghc.html
+  ISBN: '9781257638017'
+
 - id: Launchbury1995
   type: article-journal
   author:

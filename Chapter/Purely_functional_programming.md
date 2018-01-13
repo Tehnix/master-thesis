@@ -31,6 +31,8 @@ Now that we have an idea of what a functional language is, we can talk about _pu
 
 > _In essence, the new definition asserts that a language is purely functional if it can be implemented using either call-by-value, call-by-need, or call-by-name, with no observable difference between the different strategies -- other than termination properties._ [@Sabry1998, p.1]
 
+Which we can interpret as: no matter how many times you evaluate a function (as would happen with call-by-name), or when you evaluate them (call-by-need vs call-by-value), _iff_ they are pure, it will not matter since given the same input a function would give the same output, barring of course non-termination.
+
 More informally, and what is usually also the more popular and simple explanation, is that a purity means that we get referential transparency, as we know it from mathematics. This was championed by John Launchbury and Simon Peyton Jones in [@Launchbury1995].
 
 \ \
@@ -63,7 +65,7 @@ appendList a b = do
 
 : An impure function in Haskell
 
-In [@lst:impure_haskell] we note the return type of the function has become `IO [a]`. Why is that? If we inspect the function itself, we see that we suddenly added a `print` statement inside the function definition. The `print` function has the type `print :: Show a => a -> IO ()` which means it takes a _showable_ value, performs an I/O operation and finally returns `()` (called unit, which is an empty value). By using `print` inside of `appendList`, the type system now requires `appendList` to be marked as working inside I/O as well --- it is by this mechanism that we can guarentee that a function that does not have any I/O in its type signature will not perform any side-effects --- or as a popular saying in the Haskell community "It will not launch nukes", in the context of running a pure function.
+In [@lst:impure_haskell] we note the return type of the function has become `IO [a]`. Why is that? If we inspect the function itself, we see that we suddenly added a `print` statement inside the function definition. The `print` function has the type `print :: Show a => a -> IO ()` which means it takes a _showable_ value, performs an I/O operation and finally returns `()` (called unit, which is an empty value). By using `print` inside of `appendList`, the type system now requires `appendList` to be marked as working inside I/O as well---it is by this mechanism that we can guarentee that a function that does not have any I/O in its type signature will not perform any side-effects---or as a popular saying in the Haskell community "It will not launch nukes", in the context of running a pure function.
 
 
 ## Lazy vs Strict Evaluation {#sec:purely_functional_lazy}
@@ -122,7 +124,7 @@ Haskell is strongly statically typed, and features a type system with type infer
 
 \ \
 
-First, let us take a look at a simple Haskell function, as shown in[@lst:primer_haskell_function].
+First, let us take a look at a simple Haskell function, as shown in [@lst:primer_haskell_function].
 
 ```{#lst:primer_haskell_function .haskell}
 add :: Int -> Int -> Int
@@ -135,7 +137,7 @@ The first line, `add :: Int -> Int -> Int`, is the type signature. Since Haskell
 
 On the second line, `add a b = a + b`, we have the function definition, which declares a function, `add`, which takes two arguments, `a` and `b`, and then in the function body it returns `a + b`. In Haskell the last expression in the function body is the one that is returned by the function.
 
-\ \
+### Data Types
 
 Moving on, an essential part of Haskell are the types, which brings us to the three different ways of specifying types, `type` which simply aliases something, `data` which creates a new data type along with its constructors, and `newtype` which is a special form of a data type that only exist at compile time and is erased at runtime. `newtype` is often used to wrap existing types, so that one can describe different behaviour for them. For example, if you wanted to express an _email_ and a _username_, but both are `String`s, you can use a newtype such in [@lst:primer_newtypes].
 
@@ -166,9 +168,30 @@ trafficLight Green = print "Go!"
 
 : Using data types to operate a traffic light
 
-\ \
+### Typeclasses
 
-Quickly moving on, Haskell introduces a syntatic sugar for sequencing actions via _monads_, called _do-notation_, demonstrated in [@lst:primer_haskell_do].
+With this we can introduce typeclasses, which are a way of both overloading operators and function names, and providing abstractions. A typeclass, much like an interface in Java, specifies the functions which any instance of it has to implement. This gives us ad-hoc polymorphism. For example, in [@lst:primer_typeclass] we define the typeclass `Printable`, and an instance thereof.
+
+```{#lst:primer_typeclass .haskell}
+class Printable a where
+  printable :: a -> String
+
+instance Printable Int where
+  printable i = show i
+
+printing :: Printable s => s -> IO ()
+printing s = print $ printable s
+```
+
+: The `Printable` typeclass and an instance of it
+
+The example is perhaps a bit contrived; our instance just defines a way for an `Int` to be converted to a `String`, but we can now talk about functions that are constrained to types that have an instance of `Printable`, as shown in the last part of [@lst:primer_typeclass]. In the type signature, `printing :: Printable s => s -> IO ()`, we note the `Printable s =>` part, which means that all type variables, `s`, need to be instances of the `Printable` typeclass.
+
+Some commonly used typeclasses are `Show` for converting items into a `String`, `Num` to operate on numbers, `Eq` for equality (i.e. if you need to use `==` on something, it needs the `Eq` constraint) and `Ord` for ordering (i.e. `<`, `>=`, etc). One important feature of Haskell is that we can derive these typeclasses from the data type itself, meaning we do not have to constantly be writing instances for `Eq`, `Ord` or `Show`. This is done by adding `deriving (Show, Eq)` at the end of the data type declaration.
+
+### Monads
+
+Quickly moving on, Haskell introduces a syntatic sugar for sequencing actions via _monads_, called _do-notation_, demonstrated in [@lst:primer_haskell_do]. Monads are essentially just a typeclass, as we'll see in [@lst:primer_monads], and the do-notation uses the `>>=` operator, called _bind_, to sequence actions, and `return`/`pure` to put something into a monad, and `join` to collapse a monad from e.g. `m (m value)` to `m value`, where `m` would be a type variable for a monad.
 
 ```{#lst:primer_haskell_function .haskell}
 tellTheWorld :: IO ()
@@ -180,7 +203,7 @@ tellTheWorld = do
 
 : Introducing do-notation
 
-So a couple of concepts were introduced here. First we have the type signature, `tellTheWorld :: IO ()`, telling us we are performing an action in the `IO` monad. Then we use the `<-` operator, inside the do block, to pull out a monadic value from `getLine`, which has the type signature `IO String`, giving us a `String` in `name`. Then we finally use that value by concatenating the string `"Hello "` with the value of the same type, `name`. The `$` can be read as "parentheses to the end of the line", meaning we could have written `print ("Hello " ++ name)` instead.
+So a couple of concepts were introduced here. First we have the type signature, `tellTheWorld :: IO ()`, telling us we are performing an action in the `IO` monad. Then we use the `<-` operator, inside the do block, to "pull out" a monadic value from `getLine`, which has the type signature `IO String`, giving us a `String` in `name`. Then we finally use that value by concatenating the string `"Hello "` with the value of the same type, `name`. The `$` can be read as "parentheses to the end of the line", meaning we could have written `print ("Hello " ++ name)` instead.
 
 We wont delve too much into `Monad`s, `Applicative`s or `Functor`s, other than to note that they are a very common abstraction in Haskell. Their typeclasses are shown in [@lst:primer_monads] for reference.
 
@@ -206,28 +229,55 @@ class Applicative m => Monad m where
 
 : The `Functor`, `Applicative` and `Monad` type class definitions
 
-\ \
+Some common monads, besides the `IO` monad, are `Reader`, `Writer` and `State`, with the last one mimicking stateful operations. Each of these expose an interface to the user, and for all intents and purposes one just needs to understand the monads \gls{api} to use them, and not the underlying abstract mathematical concept, which comes from category theory.
 
-With this we can introduce typeclasses, which are a way of both overloading operators and function names, and providing abstractions. A typeclass, much like an interface in Java, specifies the functions which any instance of it has to implement. This gives us ad-hoc polymorphism. For example, in [@lst:primer_typeclass] we define the typeclass `Printable`, and an instance thereof.
+For example, the `State` monad exposes `get` and `put` for getting the monad value and putting/updating it respectively.
 
-```{#lst:primer_typeclass .haskell}
-class Printable a where
-  printable :: a -> String
 
-instance Printable Int where
-  printable i = show i
+### Language Extensions
 
-printing :: Printable s => s -> IO ()
-printing s = print $ printable s
+The GHC compiler is very often a target for research, and as such gets a lot of experimental of new features implemented in the language as language extensions. These are either enabled using pragmas, or by adding a flag in the project settings. Take for example a common extension `OverloadedStrings`, which provide a way for string literals to be parametrically polymorphic, by allowing anything that implements `IsString` to be a string literal, as shown in [@lst:primer_overloadedstrings].
+
+
+```{#lst:primer_overloadedstrings .haskell}
+{-# LANGUAGE OverloadedStrings #-}
+import Text
+import ByteString
+
+normalString :: String
+normalString = "A normal string"
+
+textString :: Text
+textString = "A performant unicode (utf-16) string"
+
+byteString :: ByteString
+byteString = "A fast byte implementation of strings"
 ```
 
-: The `Printable` typeclass and an instance of it
+: Using the `OverloadedStrings` language extension
 
-The example is perhaps a bit contrived; our instance just defines a way for an `Int` to be converted to a `String`, but we can now talk about functions that are constrained to types that have an instance of `Printable`, as shown in the last part of [@lst:primer_typeclass]. In the type signature, `printing :: Printable s => s -> IO ()`, we note the `Printable s =>` part, which means that all type variables, `s`, need to be instances of the `Printable` typeclass.
+This makes it convenient to work with other string types, since `String` is not the most performant, seeing as it is implemented using linked-lists. There are a ton of other language extensions too, that add to the syntax, add features to the type system and manby other things (`FlexibleInstances`, `GADTs`, `RankNTypes`, etc)
 
-\ \
 
-Finally, we are going to touch on the subject of \glspl{gadt} which are a generalization of the data types we saw earlier, allowing us to annotate the constructors with types. First, let's look at a motivation for why we even need them, by constructing a `Program`, as shown in [@lst:primer_gadts_motivation].
+### Pragmas
+Pragmas are a way to instruct the GHC compiler to do something special for certain code. For example, you can tell GHC to force inline a function by adding `{-# INLINE function_name #-}` (or not to via `NOINLINE`). There are a bunch of pragmas (language extensions are also a pragma), such as `SPECIALIZE` which allows you to specialize a function to a specific type, etc.
+
+One of particular interest is `RULES` which allow you to specify rewrite rules for code that match the \gls{lhs} of the rule with the code on the \gls{rhs} of the rule. Take for example the canonical rewrite rule, shown in [@lst:primer_rewrite], which states that if you have a `map` that applies a function, `f`, to the result of another `map` that applies the function, `g`, to a list, `xs`, is equivalent to applying `f . g` (the `.` operator composes two functions together) directly to the elements in `xs`. This means that instead of two list traversals, we now just have one.
+
+```{#lst:primer_rewrite .haskell}
+{-# RULES
+  "map/map" forall f g xs.  map f (map g xs) = map (f . g) xs
+    #-}
+```
+
+: Rewriting two `map`s into one, using rewrite rules
+
+Rewrite rules are applied until no rewrites are left, and they can be specified by the user.
+
+
+### GADTs
+
+Finally, we are going to touch on the subject of \glspl{gadt} which are a generalization of the data types we saw earlier, allowing us to annotate the constructors with types. \glspl{gadt} are one of the more advanced features of Haskell. First, let us look at a motivation for why we even need them, by constructing a `Program`, as shown in [@lst:primer_gadts_motivation].
 
 ```{#lst:primer_gadts_motivation .haskell}
 data Program
@@ -253,4 +303,8 @@ data Program a
 
 \ \
 
-While there are many more interesting extensions and concepts in Haskell, this should be sufficient to understand most of this thesis.
+While there are many more interesting extensions and concepts in Haskell, this should be provide the bare neccessities for understanding the rest of the thesis---after all, this is not meant to be a tutorial on programming languages. For a more in-depth overview of Haskell, there are multiple resources online, such as the _Haskell Wiki Book_[^1], _Learn You a Haskell For Great Good_[^2] and many more.
+
+
+[^1]: https://en.wikibooks.org/wiki/Haskell
+[^2]: http://learnyouahaskell.com/chapters
