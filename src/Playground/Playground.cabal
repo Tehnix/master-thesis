@@ -1,0 +1,15 @@
+-- This file has been generated from package.yaml by hpack version 0.20.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 506d4e8182a65a67838c7f910779220066be6cc1129cef8c37c037e3a74e45fd
+
+name:           Playground
+version:        0.1.0.0
+category:       Miscellaneous
+author:         Christian Kjaer Laustsen
+maintainer:     ckl@codetalk.io
+copyright:      Christian Kjaer Laustsen
+license:        BSD3
+build-type:     Simple
+cabal-version:  >= 2.0

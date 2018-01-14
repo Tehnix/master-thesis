@@ -72,7 +72,7 @@ In [@lst:impure_haskell] we note the return type of the function has become `IO 
 Before finally moving onto Haskell, there is a final point that is worth touching on, namely the evaluation model of the language. Programming languages are commonly split between two major evaluation models, namely lazy or strict (eager) evaluation. Let's take a brief look at what this means for a language. Let us first define a function, in [@lst:evaluation_example] so that we can compare how it evaluates under the two models.
 
 ```{#lst:evaluation_example .haskell}
-add a b = a + b
+add a b = a + b + a
 
 callAdd = add (2+3) (4*3)
 ```
@@ -85,8 +85,8 @@ Most languages implement strict evalution, usually call-by-value, which is the s
 add (2+3) (4*3)
 add 5 (4*3)
 add 5 12
-5 + 12
-17 <-- final evaluation
+5 + 12 + 5
+23 <-- final evaluation
 ```
 
 : Strict evaluation sequence
@@ -95,10 +95,17 @@ We see that arguments are evaluated before being passed into the function. Some 
 
 ```{#lst:evaluation_sequence_lazy .haskell}
 add (2+3) (4*3)
-(2+3) + (4*3) <-- final evaluation (for now)
+a:(2+3) + (4*3) + a <-- final evaluation, `a` is a pointer to the thunk of the first `a:...`
 ```
 
-: Lazy evaluation sequence
+: Lazy evaluation sequence (call-by-need)
+
+```{#lst:evaluation_sequence_lazy_name .haskell}
+add (2+3) (4*3)
+(2+3) + (4*3) + (2+3) <-- final evaluation (for now)
+```
+
+: Lazy evaluation sequence (call-by-name)
 
 The lazy evaluation leaves us with a pointer, called a thunk, which points to the computation. Only when we actually need the value inside the computation, say if we later decide to `print` it, do we perform the actual evaluation. Typically this is implemented as call-by-need, which means that it only evaluates the computation when it needs it, and additionally, memoizes the value so it does not need to reevaluate it on subsequent calls (in constrast to call-by-name, which evaluates the computation every time).
 
