@@ -1,4 +1,4 @@
-module Unsafe where
+module Main where
 
 import System.IO.Unsafe
 
@@ -15,6 +15,7 @@ offloadFunction :: (a -> b) -> a -> b
 offloadFunction f a =
   if unsafePerformIO shouldOffload then unsafePerformIO $ offload f a else f a
 
+main :: IO ()
 main = do
   print "Start:"
   offloadFunction print "Hey"

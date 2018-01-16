@@ -24,6 +24,15 @@ url = {https://ocharles.org.uk/blog/posts/2016-01-26-transformers-free-monads-mt
 urldate = {2018-01-10},
 year = {2016}
 }
+@techreport{GHCTeam2017,
+author = {{GHC Team}},
+file = {:Users/tehnix/Dropbox/University/Masters/Master Thesis/Whitepapers/H.12 - GHC 8.2.2 User's Guide Documentation.pdf:pdf},
+mendeley-groups = {Master Thesis},
+pages = {535},
+title = {{GHC User's Guide Documentation}},
+url = {https://downloads.haskell.org/{~}ghc/8.2.2/docs/users{\_}guide.pdf},
+year = {2017}
+}
 @article{Marlow2006,
 abstract = {Higher-order languages that encourage currying are typically implemented using one of two basic evaluation models: push/enter or eval/apply. Implementors use their intuition and qualitative judgements to choose one model or the other. Our goal in this paper is to provide, for the first time, a more substantial basis for this choice, based on our qualitative and quantitative experience of implementing both models in a state-of-the-art compiler for Haskell. Our conclusion is simple, and contradicts our initial intuition: compiled implementations should use eval/apply. Capsule Review Language implementors are often faced with choices about how to implement a particular language feature. Unfortunately, there is often little empirical evidence to guide us in these choices and we must rely on our, often faulty, intuition. This paper examines the choice between two different implementation techniques for curried function application and provides important guidance to future implementors about this choice. The two techniques are " push/enter, " where the callee is responsible for arity matching, and " eval/apply, " where the caller is responsible for arity matching. While many people's intuition might be that " push/enter " is more efficient, and thus worth a more complex implementation, this paper shows that, in fact, the two techniques have essentially the same performance on a wide range of Haskell programs. Thus, one concludes that implementors should choose the simpler approach: namely, eval/apply.},
 author = {Marlow, Simon and Jones, Simon Peyton},

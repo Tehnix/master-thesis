@@ -4,7 +4,7 @@ documentclass: memoir
 fontsize: 10pt
 graphics: true
 toc: true
-toc-depth: 1
+toc-depth: 2
 number-sections: true
 loa: true
 lot: true

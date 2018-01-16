@@ -38,6 +38,16 @@ references:
   title: '[Monad transformers, free monads, mtl, laws and a new approach]{.nocase}'
   URL: https://ocharles.org.uk/blog/posts/2016-01-26-transformers-free-monads-mtl-laws.html
 
+- id: GHCTeam2017
+  type: report
+  author:
+  - literal: GHC Team
+  issued:
+  - year: '2017'
+  title: '[GHC User’s Guide Documentation]{.nocase}'
+  page: '535'
+  URL: https://downloads.haskell.org/{~}ghc/8.2.2/docs/users{\_}guide.pdf
+
 - id: Marlow2006
   type: article-journal
   author:

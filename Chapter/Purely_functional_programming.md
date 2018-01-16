@@ -206,6 +206,11 @@ tellTheWorld = do
   print "Hey! What's your name?"
   name <- getLine
   print $ "Hello " ++ name
+
+-- The above do-notation desugars to:
+tellTheWorld =
+  print "Hey! What's your name?" >>
+    getLine >>= (\name -> print ("Hello " ++ name))
 ```
 
 : Introducing do-notation
@@ -279,7 +284,7 @@ One of particular interest is `RULES` which allow you to specify rewrite rules f
 
 : Rewriting two `map`s into one, using rewrite rules
 
-Rewrite rules are applied until no rewrites are left, and they can be specified by the user.
+Rewrite rules are applied until no rewrites are left, and they can be specified by the user [@GHCTeam2017].
 
 
 ### GADTs
