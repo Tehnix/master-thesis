@@ -121,13 +121,29 @@ offloadFunction f a =
 
 The code does the following:
 
-- The `offloadFunction` function simply take in a function and the last argument that should be applied,
+- The `offloadFunction` function simply take in a function and an argument that should be applied,
 - calls `shouldOffload` containing the network state which returns `True` if it makes sense to offload and `False` if not,
 - and then either return\
     - a call to `unsafePerformIO`, with `offload` taking care of performing the actual network calls to offload, which needs to be synchronous/blocking\
     - the `f a` function itself, if it should not have offloaded
 
 Admittedly a lot of implementation details are left out, but the underlying concept should still be present in the code. This implementation would allow us to do something like `offloadFunction heavyComputation input`, which will then take care of either offloading the funtion, getting back its input and returning that, or simply returning the function application as would happen in normal code.
+
+
+<!--
+TODO: Make the code polyvariadic, see:
+  - https://mail.haskell.org/pipermail/haskell-cafe/2006-May/015905.html,
+  - http://okmij.org/ftp/Haskell/vararg-fn.lhs, https://wiki.haskell.org/Varargs,
+  - http://okmij.org/ftp/Haskell/polyvariadic.html#polyvar-fn
+
+One thing that might seem a bit annoying is the fact that `offloadFunction` only works on functions with one argument. While this is certainly not a hindrance to its usage, we can actually make the function polyvariadic---i.e. a function of variable number of arguments of variable type---by extending it a bit, as shown in [@lst:approaches_unsafe_polyvariadic].
+
+```{#lst:approaches_unsafe_polyvariadic .haskell}
+
+```
+
+: Making `offloadFunction` polyvariadic
+-->
 
 \ \
 
@@ -144,13 +160,19 @@ With \glspl{ghc} support for rewriting functions using rewrite rules, one could 
 One problem with this approach though is that we can only target specific functions with our rewrite rules. For example, as shown in [@lst:approaches_rewrite_simpleFunction], we can target specific functions, in this case the function `simpleFunction`, which will then get rewritten from `simpleFunction x` into `offloadFunction simpleFunction x`.
 
 ```{#lst:approaches_rewrite_simpleFunction .haskell}
+main :: IO ()
+main = do
+  print "Start:"
+  print $ simpleFunction 3
+  print "End!"
+
 {-# RULES
 "simpleFunction/offload simpleFunction" forall x.
     simpleFunction x = offloadFunction simpleFunction x
   #-}
 
 simpleFunction :: Int -> [Int]
-simpleFunction a = map (+3) $ map (+2) [1,2,3]
+simpleFunction a = map (+a) $ map (+2) [1,2,3]
 ```
 
 : Rewrite rule for `simpleFunction` to wrap it in `offloadFunction`
@@ -183,7 +205,7 @@ and running the program, combined with the code from [@lst:approaches_unsafe], g
 "End!"
 ```
 
-_Side-note:_ the reason we defined `simpleFunction` as `map (+3) $ map (+2) [1,2,3]` was to show that multiple rewrites will take place, since `map f (map g xs) == map (f . g) xs`.
+_Side-note:_ the reason we defined `simpleFunction` as `map (+a) $ map (+2) [1,2,3]` was to show that multiple rewrites will take place, since `map f (map g xs) == map (f . g) xs`.
 
 \ \
 
@@ -330,11 +352,11 @@ TODO: Explain how this builds upon `Free` and the performance benefits along wit
 
 
 ## Manipulate the Source {#sec:approaches_source}
-E.q. haskell-src-exts or ghc-exactprint to extract the AST, add the offloading function, and output the program. Preproccessing to be exact.
+TODO: Explain how to use e.q. `haskell-src-exts` or `ghc-exactprint` to extract the AST, add the offloading function, and output the program. Preproccessing to be exact.
 
 
 ## Template Haskell {#sec:approaches_template}
-TODO: Demonstate a similar usage as the [debug package](http://neilmitchell.blogspot.dk/2017/12/announcing-debug-package.html).
+TODO: Demonstate a similar usage as the [debug package](http://neilmitchell.blogspot.dk/2017/12/announcing-debug-package.html), i.e. wrapping up functions in additional code.
 
 
 ## Common Challenges {#sec:approahces_common}

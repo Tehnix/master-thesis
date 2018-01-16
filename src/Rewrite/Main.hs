@@ -19,7 +19,7 @@ offloadFunction f a =
 main :: IO ()
 main = do
   print "Start:"
-  print $ simpleFunction 10
+  print $ simpleFunction 3
   print "End!"
 
 
@@ -29,7 +29,7 @@ main = do
   #-}
 
 simpleFunction :: Int -> [Int]
-simpleFunction a = map (+3) $ map (+2) [1,2,3]
+simpleFunction a = map (+a) $ map (+2) [1,2,3]
 
 {-
 λ src/Rewrite ‹master!› stack exec -- ghc Main.hs -O2 -ddump-rule-firings

@@ -2,4 +2,5 @@ packages:
           FreeFun/
           Unsafe/
           Rewrite/
+          Template/
           Playground/

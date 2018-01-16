@@ -18,7 +18,14 @@ But what if we could actually differentiate between something that performs I/O,
 
 \ \
 
-This finally brings us to the topic at hand---this thesis explores, as the title implies, the use of purely functional programming languages specifically for offloading of (mobile) computations, while also serving as a meta analysis on the topic of offloading, by examining the currently published reasearch and gathering the results, suggestions and advices into a unified overview. The main goal of the thesis is then to use this knowledge to explore what approaches are feasible and finally implement one of these based on its merits. The final solution is then tested on an actual mobile device, to see how it performs in various conditions.
+This finally brings us to the topic at hand---this thesis explores, as the title implies, the use of purely functional programming languages specifically for offloading of (mobile) computations, while also serving as a meta analysis on the topic of offloading, by examining the currently published reasearch and gathering the results, suggestions and advices into a unified overview. The main goal of the thesis is then to use this knowledge to explore what approaches are feasible and finally implement one of these based on its merits. The final solution is then tested on an actual mobile device, to see how it performs in various conditions. More succinctly, our goals can be stated as:
+
+- Gathering together the results, suggestions and advice from the literature on offloading
+- Compare existing systems and how they have progressed over time
+- Explain what makes purely functional programming an interesting angle to look at
+- Explore various approaches to making a system for offloading in a purely functional language
+- Implement the most suitable approach
+- Evaluate the approach, and conclude
 
 \ \
 

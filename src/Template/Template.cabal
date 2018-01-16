@@ -1,4 +1,4 @@
-name:           Unsafe
+name:           Template
 version:        0.1.0.0
 category:       Miscellaneous
 author:         Christian Kjaer Laustsen
@@ -12,7 +12,5 @@ library
   exposed-modules:
                        Main
   build-depends:       base >= 4.9 && < 5
-                     , cereal
   ghc-options:         -Wall
-                       -fno-cse
   default-language:    Haskell2010

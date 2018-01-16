@@ -1,3 +1,2 @@
 # Offloading Using a Monadic Framework {#cha:monadic_framework}
-
-Using Free/Freer
+TODO: Explain the implementation, using the `Freer` approach to set up effects for computations, local IO, remote IO, UI handling, etc.
