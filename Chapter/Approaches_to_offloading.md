@@ -6,6 +6,9 @@ With the theoretical background in place, we can begin to investigate what our p
 - **B**uy-in, for a developer to use the system
 - **G**ranularity of the offloading mechanism
 - **S**erver-side story
+- **P**ortability to other pure functional programming languages
+
+TODO: Add portability sections to all approaches (e.g. doing it in PureScript)
 
 \ \
 
@@ -103,17 +106,23 @@ A simplified example is shown in [@lst:approaches_unsafe], as a rough sketch of 
 ```{#lst:approaches_unsafe .haskell}
 import System.IO.Unsafe
 
+-- | Stub for `shouldOffload`.
 shouldOffload :: IO Bool
 shouldOffload = pure True
 
-offload :: (a -> b) -> a -> IO b
-offload f a = pure $ f a
+-- | Stub for `offload`.
+offload :: String -> (a -> b) -> a -> IO b
+offload name f a = do
+  -- Offload the function to the server,
+  print $ "Offloading function " ++ name ++ "..."
+  -- or support falling back to running it locally.
+  pure $ f a
 
+offloadFunction :: String -> (a -> b) -> a -> b
 {-# NOINLINE offloadFunction #-}
-offloadFunction :: (a -> b) -> a -> b
-offloadFunction f a =
+offloadFunction name f a =
   if unsafePerformIO shouldOffload
-    then unsafePerformIO $ offload f a
+    then unsafePerformIO $ offload name f a
     else f a
 ```
 
@@ -121,14 +130,41 @@ offloadFunction f a =
 
 The code does the following:
 
-- The `offloadFunction` function simply take in a function and an argument that should be applied,
+- The `offloadFunction` function simply take in a function name, a function and an argument that should be applied,
 - calls `shouldOffload` containing the network state which returns `True` if it makes sense to offload and `False` if not,
 - and then either return\
     - a call to `unsafePerformIO`, with `offload` taking care of performing the actual network calls to offload, which needs to be synchronous/blocking\
     - the `f a` function itself, if it should not have offloaded
 
-Admittedly a lot of implementation details are left out, but the underlying concept should still be present in the code. This implementation would allow us to do something like `offloadFunction heavyComputation input`, which will then take care of either offloading the funtion, getting back its input and returning that, or simply returning the function application as would happen in normal code.
+Admittedly a lot of implementation details are left out, but the underlying concept should still be present in the code. This implementation would allow us to do something like `offloadFunction "heavyComputation" heavyComputation input`, which will then take care of either offloading the funtion, getting back its input and returning that, or simply returning the function application as would happen in normal code.
 
+One thing to note, as Haskell is currently, there is no way to serialize or get the name of a function at runtime, which we would need to be able to tell the server exactly what code it needs to run (i.e. what function to call). This gives us a bit of an akward interface to the function, as shown in [@lst:approaches_unsafe_run].
+
+```{#lst:approaches_unsafe_run .haskell}
+main :: IO ()
+main = do
+  print "Start:"
+  print $ offloadFunction "simpleFunction" simpleFunction 3
+  print "End!"
+
+simpleFunction :: Int -> [Int]
+simpleFunction a = map (+a) $ map (+2) [1,2,3]
+```
+
+: Running code using `offloadFunction`
+
+An example of running the code, shown in [@lst:approaches_unsafe_run], will yield the output:
+
+```
+"Start:"
+"Offloading function..."
+[6,7,8]
+"End!"
+```
+
+<!--
+TODO: A problem with `offloadFunction` is that we need a way to convert a function into something that can be sent along the wire (i.e. its name), or extracting the actual code from it.
+ -->
 
 <!--
 TODO: Make the code polyvariadic, see:
@@ -168,7 +204,7 @@ main = do
 
 {-# RULES
 "simpleFunction/offload simpleFunction" forall x.
-    simpleFunction x = offloadFunction simpleFunction x
+    simpleFunction x = offloadFunction "simpleFunction" simpleFunction x
   #-}
 
 simpleFunction :: Int -> [Int]
@@ -205,11 +241,11 @@ and running the program, combined with the code from [@lst:approaches_unsafe], g
 "End!"
 ```
 
-_Side-note:_ the reason we defined `simpleFunction` as `map (+a) $ map (+2) [1,2,3]` was to show that multiple rewrites will take place, since `map f (map g xs) == map (f . g) xs`.
+_Side-note:_ the reason we defined `simpleFunction` as `map (+a) $ map (+2) [1,2,3]` also serves to show that multiple rewrites will take place, since `map f (map g xs) == map (f . g) xs`.
 
 \ \
 
-Adding calls to offload functions are indeed doable using rewrite rules, but it is a very brittle approach, since inlining will cause the rule not to fire, and it is also quite tedious, since every function one wants to offload needs a rewrite rule. As for complexity, it adds little to no real complexity on top of the `unsafePerformIO` approach from [@sec:approaches_unsafe]. Because of the brittleness, it would be most likely not see widespread adoption, even though the buy-in is very small.
+Adding calls to offload functions are indeed doable using rewrite rules, and also alleviates some of the quirky interface to `offloadFunction`, but it is a very brittle approach, since inlining will cause the rule not to fire, and it is also quite tedious, since every function one wants to offload needs a rewrite rule. As for complexity, it adds little to no real complexity on top of the `unsafePerformIO` approach from [@sec:approaches_unsafe]. Because of the brittleness, it would be most likely not see widespread adoption, even though the buy-in is very small.
 
 
 ## Mondic Framework {#sec:approaches_monadic}
@@ -221,13 +257,13 @@ There are two popular styles of writing larger applications in Haskell, the firs
 
 
 ### MTL-style
-TODO: Showcase how MTL can be used to separate the implementation and semantics, touch on the boilerplate problem (O(n*m) instances) and the lack of fine-grained control? Monad transformers arise because _Monads do not compose in general_.
+<!-- TODO: Showcase how MTL can be used to separate the implementation and semantics, touch on the boilerplate problem (O(n*m) instances) and the lack of fine-grained control? Monad transformers arise because _Monads do not compose in general_. -->
 
 
 ### Free style
 The `Free`-style of writing a program allows for a very clean separation of the semantics of the program and the interpretation of it, by first structuring a form of \gls{ast} of the program, and then constructing different interpreters depending on how you want to run the program.
 
-`Free` monads are a concept from category theory, which when used in Haskell gives us a monad for free for our data types, as long as we implement the functors for them ourselves. If you squint a bit, the data type for `Free`, shown in [@lst:approaches_free_definition], looks a lot like the data type for list, and in fact it is a fair intuition of how the structure of a program written in `Free`-style is built up. One thing that differs though, is that we would not be able to do much, if we could not rely on previous input. Luckily `Free` is not entirely like a list, and in fact works by passing continuations along the program, also known as \gls{cps}.
+`Free` monads are a concept from category theory, which when used in Haskell gives us a monad for free for our data types, as long as we implement the functors for them ourselves. If you squint a bit, the data type for `Free`, shown in [@lst:approaches_free_definition], looks a lot like the data type for list, and in fact it is a fair intuition of how the structure of a program written in `Free`-style is built up.
 
 ```{#lst:approaches_free_definition .haskell}
 data Free f r
@@ -321,11 +357,11 @@ The final step is to construct a program, using the functions defined in [@lst:a
 ```{#lst:approaches_free_program .haskell}
 program :: Program ()
 program = do
- filename <- MF.getInput
- contents <- MF.readFile filename
- MF.writeOutput contents
- result <- MF.computation 12 22
- MF.writeOutputInt result
+ filename <- getInput
+ contents <- readFile filename
+ writeOutput contents
+ result <- computation 12 22
+ writeOutputInt result
 
 main :: IO ()
 main = testInterpreter program
@@ -348,33 +384,267 @@ There is one problem with `Free` though: it has terrible performance. Constantly
 
 
 ### Freer
-TODO: Explain how this builds upon `Free` and the performance benefits along with getting functors for free. GADTs also allows us to put constraints into the signature, as to make `computation` and `writeOutput` more polymorphic.
+<!-- TODO: Explain how this builds upon `Free` and the performance benefits along with getting functors for free. GADTs also allows us to put constraints into the signature, as to make `computation` and `writeOutput` more polymorphic. -->
 
 
 ## Manipulate the Source {#sec:approaches_source}
-TODO: Explain how to use e.q. `haskell-src-exts` or `ghc-exactprint` to extract the AST, add the offloading function, and output the program. Preproccessing to be exact.
+<!-- TODO: Explain how to use e.q. `haskell-src-exts` or `ghc-exactprint` to extract the AST, add the offloading function, and output the program. Preproccessing to be exact. -->
 
 
 ## Template Haskell {#sec:approaches_template}
-TODO: Demonstate a similar usage as the [debug package](http://neilmitchell.blogspot.dk/2017/12/announcing-debug-package.html), i.e. wrapping up functions in additional code.
+\acrfull{th}---first introduced in [@Sheard2002] but greatly improved since--- is a feature of \gls{ghc} that adds meta-programming functionality to Haskell. \gls{th} is commonly used to automatically derive typeclass instances for you data types. For example, the \gls{json} parsing and encoding library, `aeson`[^aeson], can create encoders and decoders, to and from \gls{json}, simply based on your data type, by using \gls{th}. Another common usage is for \glspl{dsl} to be embedded inside Haskell code, or loading resources and files during compile time.
+
+In short, \gls{th} allows us to generate code at compile time, so we perform actions that might not yet be supported by the host language itself, or simply cut down on boilerplate code. This functionality is hosted in the `Q` monad, which exposes all the functionality we need for doing our meta-programming via \gls{th}.
+
+[^aeson]: https://hackage.haskell.org/package/aeson
+
+\ \
+
+One way we could use this meta-programming feature, and make it work for us, is by utilizing it to generate the code we need for offloading our function, while also constructing the logic that we need for the server-side of the offloading equation to work. It can also make the interface a bit smoother, by letting \gls{th} handle getting the function name that the server-side needs, using reification.
+
+An example of how this could be done is finely demonstrated in the `debug`[^debug] package, which wraps a function inside a quasiquoter, as shown in [@lst:approach_th_debug], and then generates code to debug the function and view it in a web interface.
 
 
-## Common Challenges {#sec:approahces_common}
-Common for most of these approaches---barring the monadic frameworks presented in [@sec:approaches_monadic]---is they all are missing a story for how to handle things on the server side---there needs to be a way to take in an arbitrary function, and somehow route it to the correct call along with its arguments.
+```{#lst:approach_th_debug .haskell}
+debug [d|
+   quicksort :: Ord a => [a] -> [a]
+   quicksort [] = []
+   quicksort (x:xs) = quicksort lt ++ [x] ++ quicksort gt
+       where (lt, gt) = partition (<= x) xs
+   |]
+```
 
-One way to handle this is to have a main entry point that imports all the functions that need to be accessible to offloading, but this presents a new problem entirely: cyclic imports are almost guarenteed to happen, and great care will have to be taken to avoid
+: Example of the `debug` packages' quasiquoter (from its hackage documentation)
 
-TODO: Demonstrate the cyclic import (if it actually happens).
+[^debug]: https://hackage.haskell.org/package/debug
+
+The `[d| ... |]` is quatation syntax for producing a declaration, and has the type `Q [Dec]`. There is also `[t| ... |]` giving `Q Type` for types, `[p| ... |]` giving `Q Pat` for patterns and finally `[e| ... |]` (or simply `[| ... |]`) giving `Q Exp` for expressions. An example, shown in [@lst:approach_th_runq_e], would be running our offload function call through the expressions quasiquoter, to generate the Template Haskell \gls{ast} for us.
+
+```{#lst:approach_th_runq_e .haskell}
+*Main> runQ [e| offloadFunction "simpleFunction" simpleFunction 3 |]
+AppE
+  (AppE
+    (AppE
+      (VarE Main.offloadFunction)
+      (LitE (StringL "simpleFunction"))
+    )
+    (VarE Simple.simpleFunction)
+  )
+  (LitE (IntegerL 3)
+)
+```
+
+: Generating a Template Haskell expressions in the REPL
+
+As we see, generating code using \gls{th} we are essentially manually constructing an \gls{ast} and manipulating that towards our goal. This does give us great power, but at the same time allows us to shoot ourselves in the foot very easily.
+
+\ \
+
+So, let us set up some design goals for our \gls{th} system; we want it to,
+
+- remove duplicate (and thereby error-prone) arguments when calling the offloading function, and
+- help us with the server-side of things.
+
+To do this, we could imagine making a \gls{th} function, that will simply take in the function, and its arguments, add the `offloadFunction` and neccessary additional arguments in front, and create a mapping stating what name it passed on to `offloadFunction` and which function this should call on the server-side.
+
+We tackle the first goal, by creating a function that will automatically lookup the name of the function, and construct the actual expression for `offloadFunction`. The \gls{th} code to derive this is shown in [@lst:approach_th_deriveoffload].
+
+```{#lst:approach_th_deriveoffload .haskell}
+{-# LANGUAGE TemplateHaskell #-}
+module TH where
+
+import Language.Haskell.TH
+import Language.Haskell.TH.Syntax
+import Offload (offloadFunction)
+
+deriveOffload :: Name -> Q Exp
+deriveOffload name =
+  [e|
+    offloadFunction n $a
+    |]
+  where
+    a = varE name
+    n = showName name
+```
+
+: Deriving the full offloading expression via \gls{th}
+
+To explain what is going on: we take in the function as an argument, in the form of `'functionName`---notice the single ' tick in the beginning, which is a \gls{th} special syntax to pass a function as a `Name`---which we can then convert into a string with the name, via `showName name`, and also keep the original expression, via `varE name`. We then splice in the function (i.e. the original expression) using  `$a`, inside our quasiquotation.
+
+Alternatively, we can create our own quasiquote that uses `deriveOffload`, as shown in [@lst:approach_th_deriveoffload_quasi].
+
+```{#lst:approach_th_deriveoffload_quasi .haskell}
+import Data.List (dropWhileEnd, dropWhile)
+import Data.Char (isSpace)
+import Language.Haskell.TH.Quote  (QuasiQuoter(..))
+
+off :: QuasiQuoter
+off = QuasiQuoter
+  { quoteExp = \n -> do
+      let name = dropWhileEnd isSpace $ dropWhile isSpace n
+      maybeName <- lookupValueName name
+      case maybeName of
+        Just name' -> deriveOffload name'
+        Nothing -> fail $ "The function '" ++ name
+                          ++ "' is either not in scope or"
+                          ++ " does not exist"
+  , quotePat = error "Doest not support using as pattern"
+  , quoteType = error "Doest not support using as type"
+  , quoteDec = error "Doest not support using as declaration"
+  }
+```
+
+: Wrapping our `deriveOffload` inside a quasiquoter `[off|...|]`
+
+
+Our new functions, `deriveOffload` and `[off|...|]`, are then called, as shown in, [@lst:approach_th_deriveoffload_usage].
+
+```{#lst:approach_th_deriveoffload_usage .haskell}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE QuasiQuotes #-}
+module Main where
+
+import Simple (simpleFunction)
+import Offload (offloadFunction)
+import TH
+
+main :: IO ()
+main = do
+  -- Original.
+  print $ offloadFunction "simpleFunction" simpleFunction 3
+  -- Two new Template Haskell approaches.
+  print $ $(deriveOffload 'simpleFunction) 3
+  print $ [off|simpleFunction|] 3
+```
+
+: Using `deriveOffload` and `[off|...|]`
+
+Currently we win very little, other than removing the chance of giving the wrong function name as a `String` argument to `offloadFunction` (which would mean calling the wrong function on the server-side.) But we are not done yet! For this to actually give us enough benefit that we would choose this over the original syntax, we can generate the server-side endpoint for the derived code. Let us take a closer look at how we could do that.
+
+\ \
+
+We would like our server-side routing function to act as an entry point for the server-side, and then have a mapping of `String`s to actual functions. If we could make sure a piece of \gls{th} code ran at the end, we could build up a list of function names to functions, but unfortunately we have no guarentee of order in the compilation. So, we need to divide up our compilation processes into a client compilation, which features the `deriveOffload` code, and a server compilation, which would construct the endpoint from the information made available from the finished client compilation. As such, one way to go about it is to generate a file consisting of all the mappings we need, and then have the server compilation read in this file and generate the Haskell code, via \gls{th}, that we need.
+
+Let us first extend the `deriveOffload`, as shown in [@lst:approach_th_deriveoffload_extended], to also write out the mapping in a file, in the format of `functionString:function`, separating each mapping by a newline.
+
+```{#lst:approach_th_deriveoffload_extended .haskell}
+extendedDeriveOffload :: Name -> Q Exp
+extendedDeriveOffload name = do
+  runIO storeMapping
+  [e|
+    offloadFunction n $a
+    |]
+  where
+    a = varE name
+    n = showName name
+    fileName = "FunctionMapping.txt"
+    storeMapping = do
+      fileExists <- doesFileExist fileName
+      -- For now, the name and function are identical.
+      if fileExists
+        then appendFile fileName (n ++ ":" ++ n ++ "\n")
+        else writeFile fileName (n ++ ":" ++ n ++ "\n")
+```
+
+: Extending `deriveOffload` to write the function mappings to a file
+
+We can now use this file in a later compilation process, to gather all the mappings and create endpoints that will call the specific functions. In [@lst:approach_th_deriveoffload_extended_generate_endpoints], we read in the file, remove duplicate mappings, and then generate a case for each mapping, point to its function.
+
+```{#lst:approach_th_deriveoffload_extended_generate_endpoints .haskell}
+import Data.List.Split (splitOn)
+
+deriveEndpoints :: String -> Q [Dec]
+deriveEndpoints path = do
+  content <- runIO (readFile path)
+  -- Recompile on filechange.
+  addDependentFile path
+  -- Set up all the cases.
+  let mappings = map (splitOn ":") (lines content)
+  let name = mkName "endpoint"
+      patterns = map stringToPat mappings
+      fnBodies = map stringToExp mappings
+      clauses = zipWith (\body pat -> Clause [pat] (NormalB
+                                body) []) fnBodies patterns
+  -- Handle the catch-all last clause.
+  lastClauseBody <- [e|error "Undefined mapping"|]
+  let s' = mkName "s"
+      lastClause = [Clause [VarP s'] (NormalB lastClauseBody) []]
+  pure [FunD name (clauses ++ lastClause)]
+  where
+    stringToPat :: [String] -> Pat
+    stringToPat (s:_) = LitP $ StringL s
+    stringToExp :: [String] -> Exp
+    stringToExp (_:f:[]) = VarE (mkName f)
+```
+
+: Generating endpoints from the data in the "FunctionMapping.txt" file
+
+And then in our main file, we call it with a simple `$(deriveEndpoints "FunctionMapping.txt")`.
+
+\ \
+
+There is one problem though, we are generating a function that redirects to other functions, and as such we need there to be a uniform type signature. This quickly breaks down the program when you go beyond trivial cases.
+
+One way to solve this is to evaluate the code through an interpreter, such as `hint`[^hint], which allows us to supply a string that will then get evaluated. We could then get rid of the tedious server-side generation of code, and replace it with the approach shown in [@lst:approach_th__hint]
+
+```{#lst:approach_th__hint .haskell}
+main :: IO ()
+main = do
+  res <- endpoint' ("", "Unsafe.simpleFunction") " 3"
+  print res
+
+interpreterEndpoint
+  :: (String, String)
+  -> String
+  -> Interpreter String
+interpreterEndpoint (_,f) arg = do
+  -- Extract the module name.
+  let splitFn = splitOn "." f
+      fnName = last splitFn
+      moduleName = intercalate "." $ init splitFn
+  if null moduleName
+    then setImports ["Prelude"]
+    else setImports ["Prelude", moduleName]
+  -- Evaluate the function with arguments.
+  eval $ fnName ++ arg
+
+endpoint' :: (String, String) -> String -> IO String
+endpoint' (s,f) arg = do
+  res <- runInterpreter $ interpreterEndpoint (s,f) arg
+  case res of
+    Left err -> do
+      print err
+      pure "Failed"
+    Right e -> pure e
+```
+
+: Interpreting incoming code on the server-side
+
+The endpoint takes in the code, passes it on to the interpreter, which splits it up and loads the module for the function, afterwhich it evaluates it with arguments. The endpoint then returns this result as a `String`, from which we can return it to the client, and the client can handle the type casting to the correct type.
+
+\ \
+
+Through all of this, we have seen that \gls{th} offers a lot of opportunities, but at the cost of quite some complexity. A thing to note is that \gls{th} is not known to be very portable across hardware architectures, and this might pose a bigger problem, then simply how we get the pieces to fit, if we wanted to use it. The buy-in is fairly low, since it would need to be manually added, which also means the granularity is very fine-coarsed.
+
+
+[^hint]: https://hackage.haskell.org/package/hint
 
 
 ## Evaluation {#sec:approaches_evaluation}
-The rows for [@tbl:approaches_overview] are reiterated here again, for convenience,
+Common for most of these approaches---barring the monadic frameworks presented in [@sec:approaches_monadic]---is they all are missing a story for how to handle things on the server side---there needs to be a way to take in an arbitrary function, and somehow route it to the correct call along with its arguments.
+
+One general way to handle this is to use the approach presented [@lst:approach_th__hint], which places an interpreter as the endpoint on the server-side, and this would perhaps be the most flexible way to set things up.
+
+\ \
+
+To sum up the evaluation throughout this chapter, the rows for [@tbl:approaches_overview] are reiterated here again, for convenience,
 
 - **C**omplexity of the implementation (very low--very high)
 - **A**doptability by the wider community (very low--very high)
 - **B**uy-in, for a developer to use the system (very low--very high)
 - **G**ranularity of the offloading mechanism (very fine--very coarse)
 - **S**erver-side story (none--yes)
+- **P**ortability to other pure functional programming languages
 
 --------------------------------------------------------------------------------------------------------------
 **Approach**                     **C**            **A**            **B**            **G**               **S**
@@ -393,11 +663,10 @@ Monadic Framework                Medium           High             Medium       
 **Manipulate the**               High             Medium           Medium           Coarse              Yes
 **source**
 
-Template Haskell                 Medium           Medium           Low              Very Fine           Yes
+Template Haskell                 High             Medium           Low              Very Fine           Yes
 --------------------------------------------------------------------------------------------------------------
 
 Table: Overview of the pros and cons of the different proposals {#tbl:approaches_overview}
-
 
 
 [^er]: While technically feasible, it would be a massive undertaking

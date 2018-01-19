@@ -95,7 +95,8 @@ We see that arguments are evaluated before being passed into the function. Some 
 
 ```{#lst:evaluation_sequence_lazy .haskell}
 add (2+3) (4*3)
-a:(2+3) + (4*3) + a <-- final evaluation, `a` is a pointer to the thunk of the first `a:...`
+a:(2+3) + (4*3) + a <-- final evaluation, `a` is a pointer
+                        to the thunk of the first `a:...`
 ```
 
 : Lazy evaluation sequence (call-by-need)
@@ -164,7 +165,7 @@ You are now able to force any consumer of your program \gls{api} to be aware if 
 
 Data types come in handy when we want to express multiple states, options or similar, such as a traffic light, as shown in [@lst:primer_data_types].
 
-```{#lst:primer_newtypes .haskell}
+```{#lst:primer_data_types .haskell}
 data TrafficLight = Red | Yellow | Green
 
 trafficLight :: TrafficLight -> IO ()

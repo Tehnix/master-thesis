@@ -10,7 +10,8 @@ cabal-version:  >= 2.0
 
 library
   exposed-modules:
-                       Main
+                       Rewrite
   build-depends:       base >= 4.9 && < 5
+                     , Unsafe
   ghc-options:         -Wall
   default-language:    Haskell2010

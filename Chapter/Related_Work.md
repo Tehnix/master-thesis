@@ -17,4 +17,4 @@ Explain UpShift from [@Lin2014].
 Explain MobiCOP from [@Benedetto2017].
 
 
-## Others {#sec:related_others}
+## Common Design Limitations {#sec:related_limitations}

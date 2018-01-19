@@ -10,7 +10,7 @@ cabal-version:  >=2.0
 
 library
   exposed-modules:
-                       Main
+                       FreeFun
                      , ManualFree
                      , DerivedFree
   build-depends:       base >= 4.9 && < 5

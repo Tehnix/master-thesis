@@ -1,7 +1,7 @@
 ---
 # Latex specific variables.
 documentclass: memoir
-fontsize: 10pt
+fontsize: 12pt
 graphics: true
 toc: true
 toc-depth: 2

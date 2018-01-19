@@ -10,7 +10,7 @@ cabal-version:  >= 2.0
 
 library
   exposed-modules:
-                       Main
+                       Unsafe
   build-depends:       base >= 4.9 && < 5
                      , cereal
   ghc-options:         -Wall

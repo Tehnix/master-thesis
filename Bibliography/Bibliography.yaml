@@ -504,6 +504,34 @@ references:
   title: Cloud Haskell 2.0
   URL: https://www.youtube.com/watch?v=1jJ2paFuErM
 
+- id: Sheard2002
+  type: article-journal
+  author:
+  - family: Sheard
+    given: Tim
+  - family: Jones
+    given: Simon Peyton
+  issued:
+  - year: '2002'
+  title: '[Template meta-programming for Haskell]{.nocase}'
+  container-title: ACM SIGPLAN Notices
+  page: '60'
+  volume: '37'
+  issue: '12'
+  abstract: We propose a new extension to the purely functional programming language
+    Haskell that supports compile-time meta-programming. The purpose of the system
+    is to support the algorithmic construction of programs at compile-time.The ability
+    to generate code at compile time allows the programmer to implement such features
+    as polytypic programs, macro-like expansion, user directed optimization (such
+    as inlining), and the generation of supporting data structures and functions from
+    existing data structures and functions.Our design is being implemented in the
+    Glasgow Haskell Compiler, ghc.
+  keyword: meta programming,templates
+  URL: http://portal.acm.org/citation.cfm?doid=636517.636528
+  DOI: 10.1145/636517.636528
+  ISBN: '1581136056'
+  ISSN: '03621340'
+
 - id: Maguire2017
   type: no-type
   author:

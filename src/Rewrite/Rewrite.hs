@@ -1,20 +1,6 @@
-module Main where
+module Rewrite where
 
-import System.IO.Unsafe
-
-
-shouldOffload :: IO Bool
-shouldOffload = pure True
-
-offload :: (a -> b) -> a -> IO b
-offload f a = do
-  print "Offloading function..."
-  pure $ f a
-
-offloadFunction :: (a -> b) -> a -> b
-{-# NOINLINE offloadFunction #-}
-offloadFunction f a =
-  if unsafePerformIO shouldOffload then unsafePerformIO $ offload f a else f a
+import Unsafe (offloadFunction)
 
 main :: IO ()
 main = do
@@ -25,10 +11,11 @@ main = do
 
 {-# RULES
 "simpleFunction/offload simpleFunction" forall x.
-    simpleFunction x = offloadFunction simpleFunction x
+    simpleFunction x = offloadFunction "simpleFunction" simpleFunction x
   #-}
 
 simpleFunction :: Int -> [Int]
+{-# NOINLINE simpleFunction #-}
 simpleFunction a = map (+a) $ map (+2) [1,2,3]
 
 {-

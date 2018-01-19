@@ -1,4 +1,4 @@
-module Main where
+module FreeFun where
 
 import Control.Monad.State
 import qualified ManualFree as MF
