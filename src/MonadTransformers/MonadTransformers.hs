@@ -5,7 +5,6 @@
              DeriveFunctor #-}
 module MonadTransformers where
 
-import Data.Proxy
 import Control.Monad.State
 
 

@@ -2,10 +2,14 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE ConstraintKinds #-}
 module FreerFun where
 
 import Control.Monad.Freer
 
+type Serialize a = Show a
 
 data Effect next where
   ReadFilename :: String -> Effect String
@@ -27,7 +31,7 @@ computation :: Member Effect effs => Int -> Int -> Eff effs Int
 computation i1 i2 = send $ Computation i1 i2
 
 runEffect :: Eff '[Effect, IO] a -> IO a
-runEffect = runM . interpretM (\e -> case e of
+runEffect = runM . interpretM (\case
   ReadFilename filename -> pure $ "Test file content for: " ++ filename
   WriteOutput s -> print s
   GetInput -> pure "Fake input"

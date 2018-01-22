@@ -17,6 +17,9 @@ Explain UpShift from [@Lin2014].
 Explain MobiCOP from [@Benedetto2017].
 
 
+## CloudHaskell {#sec:related_cloud_haskell}
+
+
 ## Common Design Limitations {#sec:related_limitations}
 
 

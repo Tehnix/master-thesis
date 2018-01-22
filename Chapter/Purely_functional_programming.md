@@ -309,7 +309,8 @@ data Program a
   = Value    :: Int -> Program Int
   | Boolean  :: Bool -> Program Bool
   | Addition :: Program Int -> Program Int -> Program Int
-  | Equality :: Program Boolean -> Program Boolean -> Program Boolean
+  | Equality :: Program Boolean -> Program Boolean
+                                -> Program Boolean
 ```
 
 : A \gls{gadt} to describe a program
@@ -324,4 +325,8 @@ While there are many more interesting extensions and concepts in Haskell, this s
 
 
 ## Summary
-TODO: Talk about what we learned in this chapter, and why we now think it makes sense to use purely functional programming languages.
+A purely functional programming language is one that creates a separation between effectful and non-effectful code. It contains the concept, at the type level, of purity and side-effects. This means that one can guarentee that a function, given the same input, will always return the same output---in other words, we gain referential transparency.
+
+There are two main evaluation models in functional programming languages, lazy and strict. Most language opt to go for strict evaluation, because it is by far the simplest to implement, but there are some that go for the lazy evaluation model---or rather, call-by-need---namely Haskell.
+
+Haskell is a lazy purely functional programming language, with an advanced type system, providing strong static guarentees about our programs, and giving us a way to model a lot of our logic in the type system, so as to let the compiler help catch errors for the programmer. It gives us these tools via data types, \glspl{gadt}, ad-hoc polymorphism using typeclasses, monads and other powerful abstractions.

@@ -62,8 +62,8 @@ deriveEndpoints path = do
   -- Set up all the cases.
   let mappings = map (splitOn ":") (lines content)
   let name = mkName "endpoint"
-      patterns = map stringToPat mappings
-      fnBodies = map stringToExp mappings
+      patterns = map (fst . extractString) mappings
+      fnBodies = map (snd . extractString) mappings
       clauses = zipWith (\body pat -> Clause [pat] (NormalB body) []) fnBodies patterns
   -- Handle the catch-all last clause.
   lastClauseBody <- [e|error "Undefined mapping"|]
@@ -71,7 +71,6 @@ deriveEndpoints path = do
       lastClause = [Clause [VarP s'] (NormalB lastClauseBody) []]
   pure [FunD name (clauses ++ lastClause)]
   where
-    stringToPat :: [String] -> Pat
-    stringToPat (s:_) = LitP $ StringL s
-    stringToExp :: [String] -> Exp
-    stringToExp (_:f:[]) = VarE (mkName f)
+    extractString :: [String] -> (Pat, Exp)
+    extractString (s:f:[]) = (LitP $ StringL s, VarE (mkName f))
+    extractString _ = error "Incorrect mapping, should be 's:f'"

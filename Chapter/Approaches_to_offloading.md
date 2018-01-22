@@ -182,8 +182,8 @@ The complexity would not be that high, and the buy-in would be low, but the adop
 [^psunsafe]: https://github.com/purescript/purescript-eff/blob/master/src/Control/Monad/Eff/Unsafe.purs
 
 
-## GHC Compiler/Language Extension {#sec:approaches_extension}
-À la how `ApplicativeDo` reorders computations.
+<!-- ## GHC Compiler/Language Extension {#sec:approaches_extension}
+À la how `ApplicativeDo` reorders computations. -->
 
 
 ## Rewrite Rules {#sec:approaches_rewrite}
@@ -353,7 +353,7 @@ data Effects next
 
 : Our `Effects` data type that models our program
 
-Our data type parameter, `next`, is the continuation that will allow us to go through the program. The first parameter to `ReadFile` is the filename, meaning an argument to `ReadFile`, while the second argument is the output into the continuation, `(String -> next)`, meaning it outputs a `String` to the next step. Now we can define our `Functor` instance for our data type, as defined in [@lst:approaches_free_functors].
+Our data type parameter, `next`, is the continuation that will allow us to go through the program. The first parameter to `ReadFile` is the filename, meaning an argument to `ReadFile`, while the second argument is the output into the continuation, `(String -> next)`, meaning it outputs a `String` to the next step. Now we can define our `Functor` instance for our data type, as defined in [@lst:approaches_free_functors]---we need this, because `Free` only allows us to recover the monad by assuming the functor operations.
 
 ```{#lst:approaches_free_functors .haskell}
 instance Functor Effects where
@@ -366,7 +366,7 @@ instance Functor Effects where
 
 : The `Functor` instance for our `Effects` data type
 
-Which is fairly straight forward. The `f` of the `fmap` either gets composed with the continuation of the data type (e.g. `f . g`) if there are arguments to the continuation, or applies `f g` if the continuation is a plain `next`.
+This is fairly straight forward; the `f` of the `fmap` either gets composed with the continuation of the data type (e.g. `f . g`) if there are arguments to the continuation, or applies `f g` if the continuation is a plain `next`.
 
 The next step is to setup our functions that lift our functors into the `Free` monad, along with creating a type alias for our `Free Effects` program, as shown in [@lst:approaches_free_functions].
 
@@ -447,8 +447,6 @@ There is one problem with `Free` though: it has terrible performance. Constantly
 
 
 ### Freer
-<!-- TODO: Explain how this builds upon `Free` and the performance benefits along with getting functors for free. GADTs also allows us to put constraints into the signature, as to make `computation` and `writeOutput` more polymorphic. -->
-
 `Freer`, introduced in [@Kiselyov2015], changes up the exact way we go about creating our effects, but the overall idea is the same as `Free`---to create a clean separation between the program semantics and the implementation details.
 
 The first difference comes from our data type, which is now a \gls{gadt}, as shown in [@lst:approaches_freer_data]. This also gives us the power to use constraints on our types, and we can do away with the two `writeOutput` functions, and simply require the argument to be `Show`able.
@@ -600,8 +598,6 @@ We tackle the first goal, by creating a function that will automatically lookup 
 
 ```{#lst:approach_th_deriveoffload .haskell}
 {-# LANGUAGE TemplateHaskell #-}
-module TH where
-
 import Language.Haskell.TH
 import Language.Haskell.TH.Syntax
 import Offload (offloadFunction)
@@ -649,14 +645,7 @@ off = QuasiQuoter
 Our new functions, `deriveOffload` and `[off|...|]`, are then called, as shown in, [@lst:approach_th_deriveoffload_usage].
 
 ```{#lst:approach_th_deriveoffload_usage .haskell}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE QuasiQuotes #-}
-module Main where
-
-import Simple (simpleFunction)
-import Offload (offloadFunction)
-import TH
-
+{-# LANGUAGE TemplateHaskell, QuasiQuotes #-}
 main :: IO ()
 main = do
   -- Original.
@@ -697,26 +686,23 @@ extendedDeriveOffload name = do
 We can now use this file in a later compilation process, to gather all the mappings and create endpoints that will call the specific functions. In [@lst:approach_th_deriveoffload_extended_generate_endpoints], we read in the file, remove duplicate mappings, and then generate a case for each mapping, point to its function.
 
 ```{#lst:approach_th_deriveoffload_extended_generate_endpoints .haskell}
-import Data.List.Split (splitOn)
-
 deriveEndpoints :: String -> Q [Dec]
 deriveEndpoints path = do
   content <- runIO (readFile path)
   addDependentFile path -- Recompile on filechange.
   let mappings = map (splitOn ":") (lines content)
-  let name = mkName "endpoint"
-      patterns = map stringToPat mappings
-      fnBodies = map stringToExp mappings
-      clauses = zipWith (\body pat -> Clause [pat] (NormalB
-                                body) []) fnBodies patterns
-  -- Handle the catch-all last clause.
+  let name = mkName "endpoint" -- Set up all the cases.
+      patterns = map (fst . extractString) mappings
+      fnBodies = map (snd . extractString) mappings
+      clauses = zipWith (\body pat -> Clause [pat] (NormalB body) [])
+                                      fnBodies patterns
   lastClauseBody <- [e|error "Undefined mapping"|]
-  let s' = mkName "s"
+  let s' = mkName "s" -- Handle the catch-all last clause.
       lastClause = [Clause [VarP s'] (NormalB lastClauseBody) []]
   pure [FunD name (clauses ++ lastClause)]
   where
-    stringToPat (s:_) = LitP $ StringL s
-    stringToExp (_:f:[]) = VarE (mkName f)
+    extractString :: [String] -> (Pat, Exp)
+    extractString (s:f:[]) = (LitP $ StringL s, VarE (mkName f))
 ```
 
 : Generating endpoints from the data in the "FunctionMapping.txt" file
@@ -773,42 +759,39 @@ Through all of this, we have seen that \gls{th} offers a lot of opportunities, b
 
 
 ## Evaluation {#sec:approaches_evaluation}
-Common for most of these approaches---barring the monadic frameworks presented in [@sec:approaches_monadic], and Template Haskell in [@sec:approaches_template]---is that they all are missing a story for how to handle things on the server side; there needs to be a way to take in an arbitrary function, and somehow route it to the correct call along with its arguments.
-
-One general way to handle this is to use the approach presented [@lst:approach_th__hint], which places an interpreter as the endpoint on the server-side, and this would perhaps be the most flexible way to set things up.
-
-\ \
-
 To sum up the evaluation throughout this chapter, the rows for [@tbl:approaches_overview] are reiterated here again, for convenience,
 
 - **C**omplexity of the implementation (very low--very high)
 - **A**doptability by the wider community (very low--very high)
 - **B**uy-in, for a developer to use the system (very low--very high)
 - **G**ranularity of the offloading mechanism (very fine--very coarse)
-- **S**erver-side story (none--yes)
-- **P**ortability to other pure functional programming languages (none, some or yes)
+- **S**erver-side story (no--yes)
+- **P**ortability to other pure functional programming languages (no--yes)
 
 -----------------------------------------------------------------------------------------------------------------------------
 **Approach**                     **C**            **A**            **B**            **G**               **S**     **P**
 -------------------------------- ---------------- ---------------- ---------------- ------------------- --------- -----------
-Extending the runtime            Very High[^er]   Low              High             Very Coarse[^pure]  None      None
+Extending the runtime            Very High[^er]   Low              High             Very Coarse[^pure]  No        No
 
-**unsafePerformIO**              **Low**          **Medium**       **Low**          **Very Fine[^man]** **None**  **Some**
+**unsafePerformIO**              **Low**          **Mid**          **Low**          **Very Fine[^man]** **No**    **Yes**
 
-Compiler/Language                High             Medium           Medium           Coarse              None      None
-Extension
+**Rewrite Rules**                **Low**          **Low**          **Low**          **Very Fine[^re]**  **No**    **No**
 
-**Rewrite Rules**                **Low**          **Low**          **Low**          **Very fine[^re]**  **None**  **None**
+Monadic Framework                Mid              High             Mid              Flexible[^flex]     Yes       Yes
 
-Monadic Framework                Medium           High             Medium           Flexible[^flex]     Yes       Yes
-
-**Template Haskell**             **High**         **Medium**       **Low**          **Very Fine**       **Yes**   **None**
+**Template Haskell**             **High**         **Mid**          **Low**          **Very Fine**       **Yes**   **No**
 -----------------------------------------------------------------------------------------------------------------------------
 
 Table: Overview of the pros and cons of the different proposals {#tbl:approaches_overview}
 
-<!-- Manipulate the                   High             Medium           Medium           Coarse              Yes       None
-source -->
+<!--
+Manipulate the                   High             Medium           Medium           Coarse              Yes       None
+source
+
+Compiler/Language                High             Mid              Mid              Coarse              No        No
+Extension
+
+-->
 
 [^er]: While technically feasible, it would be a massive undertaking
 [^pure]: All pure _known_ functions with saturated arguments
@@ -818,4 +801,10 @@ source -->
 
 
 ## Summary
-TODO: Sum up the chapter and the framework we land on.
+We have explored several ways to approach the design of our offloading system, with each their respective strengths and drawbacks, although strongly indicating that the monadic framework, presented in [@sec:approaches_monadic], seems to be the most flexible and powerful approach.
+
+Common for most of these approaches---barring the monadic framework, and Template Haskell in [@sec:approaches_template]---is that they all are missing a story for how to handle things on the server side; there needs to be a way to take in an arbitrary function, and somehow route it to the correct call along with its arguments.
+
+One general way to handle this, as we see in [@lst:approach_th_hint], is to place an interpreter as the endpoint on the server-side, and this would perhaps be the most flexible way to set things up, although not entirely desirable.
+
+We land on the monadic framework, using `Freer` (or, extensible effects), as the approach we will proceed with in \cref{cha:monadic_framework}, and use for our implementation. It allows us to cleanly separate our program semantics from implementation, allowing us to do different things on the server and client, for the same program. It also is the only one that provides both a story for server-side, and also is portable across languages.
