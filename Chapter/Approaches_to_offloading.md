@@ -8,8 +8,6 @@ With the theoretical background in place, we can begin to investigate what our p
 - **S**erver-side story
 - **P**ortability to other pure functional programming languages
 
-TODO: Add portability sections to all approaches (e.g. doing it in PureScript)
-
 \ \
 
 For reference in the rest of the chapter, an overview of the GHC system is presented in [@fig:approaches_ghc_overview]. GHC and Haskell is used interchangeably throughout, seeing as GHC it is considered the de facto compiler for Haskell.
@@ -77,7 +75,7 @@ While this may still seem like too coarse a granularity, one could eventually ad
 
 \ \
 
-As such, we can conclude that extending the runtime is first and foremost a very complex and huge undertaking. Further more it would require quite the buy-in from the users, since they would have to use a custom version of the \gls{ghc} compiler, seeing as it would probably be hard (and would take years due to the feature cycle of \gls{ghc}) to get it into the main GHC implementation. This will also greatly hurt adoptability, and the custom \gls{ghc} compiler would have to play catch up to the main implementation. And of course, we do not have a server-side story, since this would only enable the offloading mechanism, but nothing in regards to how the server should be implemented.
+As such, we can conclude that extending the runtime is first and foremost a very complex and huge undertaking. Further more it would require quite the buy-in from the users, since they would have to use a custom version of the \gls{ghc} compiler, seeing as it would probably be hard (and would take years due to the feature cycle of \gls{ghc}) to get it into the main GHC implementation. This will also greatly hurt adoptability---not to mention portability---and the custom \gls{ghc} compiler would have to play catch up to the main implementation. And of course, we do not have a server-side story, since this would only enable the offloading mechanism, but nothing in regards to how the server should be implemented.
 
 A final note is that it would also involve implementing the whole system in C, which sort of defeats the purpose of exploring what we can use purely functional programming languages for.
 
@@ -163,11 +161,7 @@ An example of running the code, shown in [@lst:approaches_unsafe_run], will yiel
 ```
 
 <!--
-TODO: A problem with `offloadFunction` is that we need a way to convert a function into something that can be sent along the wire (i.e. its name), or extracting the actual code from it.
- -->
-
-<!--
-TODO: Make the code polyvariadic, see:
+FIXME: Make the code polyvariadic, see:
   - https://mail.haskell.org/pipermail/haskell-cafe/2006-May/015905.html,
   - http://okmij.org/ftp/Haskell/vararg-fn.lhs, https://wiki.haskell.org/Varargs,
   - http://okmij.org/ftp/Haskell/polyvariadic.html#polyvar-fn
@@ -183,7 +177,9 @@ One thing that might seem a bit annoying is the fact that `offloadFunction` only
 
 \ \
 
-The complexity would not be that high, and the buy-in would be low, but the adoptability will probably not be the greatest seeing as `unsafePerformIO` introduces quite a lot of uncertainty in the program. The implementation would need to be battle-tested for people to be willing to trust it at least. As for granularity, it is very fine-grained---perhaps too much---function calls need to be manually placed at places that might benefit from offloading. Finally, there is yet again no server-side story.
+The complexity would not be that high, and the buy-in would be low, but the adoptability will probably not be the greatest seeing as `unsafePerformIO` introduces quite a lot of uncertainty in the program, and is generally is avoided if possible. The implementation would need to be battle-tested for people to be willing to trust it at least. As for granularity, it is very fine-grained---perhaps too much---function calls need to be manually placed at places that might benefit from offloading. Finally, there is yet again no server-side story. Finally, portability is a bit up in the air, since `unsafePerformIO` is Haskell specific, but it could very well be implemented using similar constructs if a language supports any form of escape-hatch into IO---for example `unsafePerformEff`[^psunsafe] in PureScript or `unsafePerformIO` in Idris, although both languages are strict, so the evaluation will differ a bit.
+
+[^psunsafe]: https://github.com/purescript/purescript-eff/blob/master/src/Control/Monad/Eff/Unsafe.purs
 
 
 ## GHC Compiler/Language Extension {#sec:approaches_extension}
@@ -245,7 +241,9 @@ _Side-note:_ the reason we defined `simpleFunction` as `map (+a) $ map (+2) [1,2
 
 \ \
 
-Adding calls to offload functions are indeed doable using rewrite rules, and also alleviates some of the quirky interface to `offloadFunction`, but it is a very brittle approach, since inlining will cause the rule not to fire, and it is also quite tedious, since every function one wants to offload needs a rewrite rule. As for complexity, it adds little to no real complexity on top of the `unsafePerformIO` approach from [@sec:approaches_unsafe]. Because of the brittleness, it would be most likely not see widespread adoption, even though the buy-in is very small.
+Adding calls to offload functions are indeed doable using rewrite rules, and also alleviates some of the quirky interface to `offloadFunction`, but it is a very brittle approach, since inlining will cause the rule not to fire, and it is also quite tedious, since every function one wants to offload needs a rewrite rule. As for complexity, it adds little to no real complexity on top of the `unsafePerformIO` approach from [@sec:approaches_unsafe]. Because of the brittleness, it would be most likely not see widespread adoption, even though the buy-in is very small. It is also a not portable, e.g. PureScript still does not have a concrete proposal for rewrites[^psrewrite].
+
+[^psrewrite]: https://github.com/purescript/purescript/issues/2749
 
 
 ## Mondic Framework {#sec:approaches_monadic}
@@ -253,12 +251,77 @@ An approach less radical than the others so far, is to utilize the structure of 
 
 ![Multiple interpreters from a single program](Graphic/Multiple Interpreters.png "Multiple interpreters from a single program"){#fig:approaches_monadic_multiple_interpreters width=60% }
 
-There are two popular styles of writing larger applications in Haskell, the first one, and by far most popular, is the \gls{mtl} style, and the second is using a concept known as `Free` monads---let us dive into the former first.
+There are two popular styles of writing larger applications in Haskell, the first one, and by far most popular, is the \gls{mtl} style, and the second is using a concept known as `Free` monads. We will down into the second one, for reasons that shall become obvious as we go along.
 
 
+<!--
 ### MTL-style
-<!-- TODO: Showcase how MTL can be used to separate the implementation and semantics, touch on the boilerplate problem (O(n*m) instances) and the lack of fine-grained control? Monad transformers arise because _Monads do not compose in general_. -->
+TODO: Showcase how MTL can be used to separate the implementation and semantics, touch on the boilerplate problem (O(n*m) instances) and the lack of fine-grained control? Monad transformers arise because _Monads do not compose in general_.
+What does the `|` in `class MonadReader r m | m -> r` mean?
 
+Monad transformers came about because of a natural limitations of monads, namely that they do not compose. One way to mitigate this, is then to have a set of transformers that know how to go from one specific monad instance, to another.
+
+For example, from the \gls{mtl} we have the `Reader` monad as `MonadReader` with the interface for the monadic operations it support, and then instances for each monad it supports, including its own base case, `ReaderT`, as shown in [@lst:approaches_mtl_reader].
+
+```{#lst:approaches_mtl_reader .haskell}
+class MonadReader r m | m -> r where
+  ask :: m r
+
+instance Monad m => MonadReader r (ReaderT r m) where
+  ask = Control.Monad.Trans.ReaderT.ask
+
+instance (MonadReader r m) => MonadReader r (StateT s) where
+  ask = lift ask
+```
+
+: The `MonadReader` class and its instances for `ReaderT` and `StateT`
+
+We see that in the first instance---the base case---it simply uses the `ask` operation from `ReaderT` directly, but in the second instance, where `MonadReader` is wrapping `StateT`, it needs to life the ask operation once, because the ask operation will be called from inside the `StateT` monad, and therefore needs to bubble one level up.
+
+This provides us with a general way of composing these transformers, at the expense of writing boilerplate code for the monads that we want to compose with. In fact, for every monad instance you add, you would need $n^2$ instances (at least if you want full composition). For example, to support `MonadReader` and `MonadState`, we need a base case for each and then an instance for `MonadState` supporting `ReaderT` and one for `MonadReader` supporting `StateT`. This can quickly grow, so we are getting this flexibility at the expense of setting up some boilerplate.
+
+\ \
+
+Going back to the task at hand, what we really want is a way to create operations---without specifying the type of effects---that can be abstracted over, and later on a concrete type can be choosen, depending on the place we want to use the program, be it client-side, testing or server-side.
+
+The way we would do this in the \gls{mtl}-style, is to have our operations as typeclass methods, and then instantiate it to the various types we need. For example, as shown in [@lst:approaches_mtl_effects], we could have our methods defined as a set of operations we can perform, collected in the typeclasses `MonadOperations` and `MonadRemotableOperations`.
+
+```{#lst:approaches_mtl_effects .haskell}
+class Offload m where
+  offload :: (a -> b) -> a -> m b
+
+class MonadOperations m where
+  writeOutput :: String -> m ()
+  getInput :: m String
+
+class (Offload m) => MonadRemotableOperations m where
+  computation :: Int -> Int -> m Int
+```
+
+: Modelling our operations as the typeclasses `MonadOperations` and `MonadRemotableOperations`
+
+We then do the instantiation, first for the server-side as shown in [@lst:approaches_mtl_effects_server], which will live in `IO`, and only needs to support `MonadRemotableOperations`,
+
+```{#lst:approaches_mtl_effects_server .haskell}
+instance (MonadIO m) => MonadRemoteOperations m where
+  computation i1 i2 = pure $ i1 + i2
+```
+
+: Instance for `MonadRemotableOperations` on the server-side
+
+And the client-side, shown in [@lst:approaches_mtl_effects_client], needs to support both `MonadOperations` and `MonadRemotableOperations`.
+
+```{#lst:approaches_mtl_effects_client .haskell}
+instance (MonadIO m) =>  MonadOperations m where
+  writeOutput str = putStrLn str
+  getInput = getLine
+
+instance (MonadIO m) => MonadRemoteOperations m where
+  computation i1 i2 = pure $ i1 + i2
+```
+
+: Instance for `MonadOperations` and `MonadRemotableOperations` on the client-side
+-->
 
 ### Free style
 The `Free`-style of writing a program allows for a very clean separation of the semantics of the program and the interpretation of it, by first structuring a form of \gls{ast} of the program, and then constructing different interpreters depending on how you want to run the program.
@@ -386,9 +449,95 @@ There is one problem with `Free` though: it has terrible performance. Constantly
 ### Freer
 <!-- TODO: Explain how this builds upon `Free` and the performance benefits along with getting functors for free. GADTs also allows us to put constraints into the signature, as to make `computation` and `writeOutput` more polymorphic. -->
 
+`Freer`, introduced in [@Kiselyov2015], changes up the exact way we go about creating our effects, but the overall idea is the same as `Free`---to create a clean separation between the program semantics and the implementation details.
 
-## Manipulate the Source {#sec:approaches_source}
-<!-- TODO: Explain how to use e.q. `haskell-src-exts` or `ghc-exactprint` to extract the AST, add the offloading function, and output the program. Preproccessing to be exact. -->
+The first difference comes from our data type, which is now a \gls{gadt}, as shown in [@lst:approaches_freer_data]. This also gives us the power to use constraints on our types, and we can do away with the two `writeOutput` functions, and simply require the argument to be `Show`able.
+
+```{#lst:approaches_freer_data .haskell}
+data Effect n where
+  ReadFile :: String -> Effect String
+  WriteOutput :: Show a => a -> Effect ()
+  GetInput :: Effect String
+  Computation :: Int -> Int -> Effect Int
+```
+
+: Our `Effect` GADT that models our program
+
+As we can see, we also get a more function-like syntax, and do away with our explicit continuations. Another thing to note is that `Freer` goes beyond `Free` and gives us not just `bind` and `join` for free, but also `Functor`, meaning we do not have to write or derive these instances anymore.
+
+The next step is to model our functions, which are then ones we will use when writing our `Freer` programs. It follows much the same way as for `Free`, in that we define a function for each constructor in our \gls{gadt}, but other than that it is a quite different type signature and we also use a different function to lift it into `Freer`, as shown in [@lst:approaches_freer_functions].
+
+```{#lst:approaches_freer_functions .haskell}
+readFilename :: Member Effect effs => String -> Eff effs String
+readFilename = send . ReadFilename
+
+writeOutput :: (Member Effect effs, Show a) => a -> Eff effs ()
+writeOutput = send . WriteOutput
+
+getInput :: Member Effect effs => Eff effs String
+getInput = send GetInput
+
+computation :: Member Effect effs => Int -> Int -> Eff effs Int
+computation i1 i2 = send $ Computation i1 i2
+```
+
+: Functions lifting the GADT constructors into our effects
+
+We are now ready to write our interpreter, as shown in [@lst:approaches_freer_interpreter]. Here we, much like with `Free`, simply pattern match on each of the type constructors from our `Effect` \gls{gadt}, and perform the actions which the specific interpreter should take. A thing to note is the new syntax in the type signature, `'[Effect, IO]` (note the tick, `'`, in front of the list). This is a type-level list, and tells us that our effects consists of `Effect` and `IO`. We could add more here if we wanted to, making them composable.
+
+```{#lst:approaches_freer_interpreter .haskell}
+runEffect :: Eff '[Effect, IO] a -> IO a
+runEffect = runM . interpretM (\e -> case e of
+  ReadFilename filename -> pure $ "Test file content for: " ++ filename
+  WriteOutput s -> print s
+  GetInput -> pure "Fake input"
+  Computation i1 i2 -> pure $ i1 + i2)
+```
+
+: Interpreter for our `Freer` program
+
+We can also see, from [@lst:approaches_freer_interpreter], that we do not have to manually end with the continuation to the next call of the interpreter anymore, removing some boilerplate code.
+
+And finally we can run the interpreter on a program, as we have done in [@lst:approaches_freer_interpreter].
+
+```{#lst:approaches_freer_interpreter .haskell}
+program :: Eff '[Effect, IO] ()
+program = do
+ filename <- getInput
+ contents <- readFilename filename
+ writeOutput contents
+ result <- computation 12 22
+ writeOutput result
+
+main :: IO ()
+main = runEffect program
+```
+
+: Running the `Freer` interpreter on our program
+
+Which yields the output,
+
+```
+Test file content for: Fake input
+34
+```
+
+exactly like `Free`.
+
+\ \
+
+We have now seen a way we can structure our program so that we can seperate our semantics from our implementation, giving us great freedom in moving bits of the program execution around as we see fit. We can choose certain effects to be offloadable, and then have more or less the same interpreter on the server-side, just without the choice to offload. Another benefit is that data types are serializable, whereas functions are not. We have seen this problem arise for example in [@sec:approaches_unsafe], where we had to pass a `String` with the function name/id on, so that we could identify it on the server-side.
+
+We gain a lot for very little real complexity, while also maintaining an approach that is both easily adoptable---and in fact already in use, albeit for different goals---and also very portable to other languages, with sufficient enough type systems (like Idris or PureScript). We have a server-side story, and a flexible coarsing for choosing what to offload.
+
+<!-- ## Manipulate the Source {#sec:approaches_source} -->
+<!-- TODO: Explain how to use e.q. `haskell-src-exts` or `ghc-exactprint` to extract the AST, add the offloading function, and output the program. Preproccessing to be exact.
+- http://mpickering.github.io/posts/2015-07-23-ghc-exactprint.html
+- https://www.reddit.com/r/haskell/comments/3edts8/announcing_ghcexactprint_a_new_foundation_for/
+- https://stackoverflow.com/questions/15784076/parsing-unicodesyntax-with-haskell-src-exts
+- https://hackage.haskell.org/package/ghc-exactprint
+- https://hackage.haskell.org/package/haskell-src-exts
+ -->
 
 
 ## Template Haskell {#sec:approaches_template}
@@ -531,17 +680,14 @@ Let us first extend the `deriveOffload`, as shown in [@lst:approach_th_deriveoff
 extendedDeriveOffload :: Name -> Q Exp
 extendedDeriveOffload name = do
   runIO storeMapping
-  [e|
-    offloadFunction n $a
-    |]
+  [e| offloadFunction n $a |]
   where
     a = varE name
     n = showName name
     fileName = "FunctionMapping.txt"
     storeMapping = do
       fileExists <- doesFileExist fileName
-      -- For now, the name and function are identical.
-      if fileExists
+      if fileExists -- For now, the name and function are identical.
         then appendFile fileName (n ++ ":" ++ n ++ "\n")
         else writeFile fileName (n ++ ":" ++ n ++ "\n")
 ```
@@ -556,9 +702,7 @@ import Data.List.Split (splitOn)
 deriveEndpoints :: String -> Q [Dec]
 deriveEndpoints path = do
   content <- runIO (readFile path)
-  -- Recompile on filechange.
-  addDependentFile path
-  -- Set up all the cases.
+  addDependentFile path -- Recompile on filechange.
   let mappings = map (splitOn ":") (lines content)
   let name = mkName "endpoint"
       patterns = map stringToPat mappings
@@ -571,9 +715,7 @@ deriveEndpoints path = do
       lastClause = [Clause [VarP s'] (NormalB lastClauseBody) []]
   pure [FunD name (clauses ++ lastClause)]
   where
-    stringToPat :: [String] -> Pat
     stringToPat (s:_) = LitP $ StringL s
-    stringToExp :: [String] -> Exp
     stringToExp (_:f:[]) = VarE (mkName f)
 ```
 
@@ -583,29 +725,20 @@ And then in our main file, we call it with a simple `$(deriveEndpoints "Function
 
 \ \
 
-There is one problem though, we are generating a function that redirects to other functions, and as such we need there to be a uniform type signature. This quickly breaks down the program when you go beyond trivial cases.
+There is one problem though, we are generating a function that redirects to other functions, and as such we need there to be a uniform type signature. This quickly breaks down the program when you go beyond trivial cases, although we could alleviate some of this with some typeclass trickery and existential types.
 
-One way to solve this is to evaluate the code through an interpreter, such as `hint`[^hint], which allows us to supply a string that will then get evaluated. We could then get rid of the tedious server-side generation of code, and replace it with the approach shown in [@lst:approach_th__hint]
+Another way to solve this is to evaluate the code through an interpreter, such as `hint`[^hint], which allows us to supply a string that will then get evaluated. We could then get rid of the tedious server-side generation of code, and replace it with the approach shown in [@lst:approach_th_hint], and running the code in [@lst:approach_th_hint_run], which outputs `"[6,7,8]"` (i.e. a `String` with the result).
 
-```{#lst:approach_th__hint .haskell}
-main :: IO ()
-main = do
-  res <- endpoint' ("", "Unsafe.simpleFunction") " 3"
-  print res
-
-interpreterEndpoint
-  :: (String, String)
-  -> String
-  -> Interpreter String
+```{#lst:approach_th_hint .haskell}
+interpreterEndpoint :: (String, String) -> String
+                    -> Interpreter String
 interpreterEndpoint (_,f) arg = do
-  -- Extract the module name.
   let splitFn = splitOn "." f
       fnName = last splitFn
       moduleName = intercalate "." $ init splitFn
   if null moduleName
     then setImports ["Prelude"]
     else setImports ["Prelude", moduleName]
-  -- Evaluate the function with arguments.
   eval $ fnName ++ arg
 
 endpoint' :: (String, String) -> String -> IO String
@@ -620,18 +753,27 @@ endpoint' (s,f) arg = do
 
 : Interpreting incoming code on the server-side
 
+```{#lst:approach_th_hint_run .haskell}
+main = do
+  res <- endpoint' ("", "Unsafe.simpleFunction") " 3"
+  print res
+```
+
+: Running the interpreter on incoming code on the server-side
+
+
 The endpoint takes in the code, passes it on to the interpreter, which splits it up and loads the module for the function, afterwhich it evaluates it with arguments. The endpoint then returns this result as a `String`, from which we can return it to the client, and the client can handle the type casting to the correct type.
 
 \ \
 
-Through all of this, we have seen that \gls{th} offers a lot of opportunities, but at the cost of quite some complexity. A thing to note is that \gls{th} is not known to be very portable across hardware architectures, and this might pose a bigger problem, then simply how we get the pieces to fit, if we wanted to use it. The buy-in is fairly low, since it would need to be manually added, which also means the granularity is very fine-coarsed.
+Through all of this, we have seen that \gls{th} offers a lot of opportunities, but at the cost of quite some complexity. A thing to note is that \gls{th} is known not to be very portable across hardware architectures, and this might pose a bigger problem, then simply how we get the pieces to fit, if we wanted to use it. The buy-in is fairly low, since it would need to be manually added, which also means the granularity is very fine-coarsed.
 
 
 [^hint]: https://hackage.haskell.org/package/hint
 
 
 ## Evaluation {#sec:approaches_evaluation}
-Common for most of these approaches---barring the monadic frameworks presented in [@sec:approaches_monadic]---is they all are missing a story for how to handle things on the server side---there needs to be a way to take in an arbitrary function, and somehow route it to the correct call along with its arguments.
+Common for most of these approaches---barring the monadic frameworks presented in [@sec:approaches_monadic], and Template Haskell in [@sec:approaches_template]---is that they all are missing a story for how to handle things on the server side; there needs to be a way to take in an arbitrary function, and somehow route it to the correct call along with its arguments.
 
 One general way to handle this is to use the approach presented [@lst:approach_th__hint], which places an interpreter as the endpoint on the server-side, and this would perhaps be the most flexible way to set things up.
 
@@ -644,33 +786,36 @@ To sum up the evaluation throughout this chapter, the rows for [@tbl:approaches_
 - **B**uy-in, for a developer to use the system (very low--very high)
 - **G**ranularity of the offloading mechanism (very fine--very coarse)
 - **S**erver-side story (none--yes)
-- **P**ortability to other pure functional programming languages
+- **P**ortability to other pure functional programming languages (none, some or yes)
 
---------------------------------------------------------------------------------------------------------------
-**Approach**                     **C**            **A**            **B**            **G**               **S**
--------------------------------- ---------------- ---------------- ---------------- ------------------- ---------
-Extending the runtime            Very High[^er]   Low              High             Very Coarse[^pure]  None
+-----------------------------------------------------------------------------------------------------------------------------
+**Approach**                     **C**            **A**            **B**            **G**               **S**     **P**
+-------------------------------- ---------------- ---------------- ---------------- ------------------- --------- -----------
+Extending the runtime            Very High[^er]   Low              High             Very Coarse[^pure]  None      None
 
-**unsafePerformIO**              **Low**          **Medium**       **Low**          **Very Fine[^man]** **None**
+**unsafePerformIO**              **Low**          **Medium**       **Low**          **Very Fine[^man]** **None**  **Some**
 
-Compiler/Language                High             Medium           Medium           Coarse
+Compiler/Language                High             Medium           Medium           Coarse              None      None
 Extension
 
-**Rewrite Rules**                **Low**          **Low**          **Low**          **Very fine[^re]**  **None**
+**Rewrite Rules**                **Low**          **Low**          **Low**          **Very fine[^re]**  **None**  **None**
 
-Monadic Framework                Medium           High             Medium           Flexible[^flex]     Yes
+Monadic Framework                Medium           High             Medium           Flexible[^flex]     Yes       Yes
 
-**Manipulate the**               High             Medium           Medium           Coarse              Yes
-**source**
-
-Template Haskell                 High             Medium           Low              Very Fine           Yes
---------------------------------------------------------------------------------------------------------------
+**Template Haskell**             **High**         **Medium**       **Low**          **Very Fine**       **Yes**   **None**
+-----------------------------------------------------------------------------------------------------------------------------
 
 Table: Overview of the pros and cons of the different proposals {#tbl:approaches_overview}
 
+<!-- Manipulate the                   High             Medium           Medium           Coarse              Yes       None
+source -->
 
 [^er]: While technically feasible, it would be a massive undertaking
 [^pure]: All pure _known_ functions with saturated arguments
 [^man]: Manually controlled by adding function calls before the code that should be offloaded
 [^re]: Needs a rewrite rule for every function that should support offloading
 [^flex]: Very flexible granularity, since one can simply add more fine-grained effects if the offloading should be more fine-grainde
+
+
+## Summary
+TODO: Sum up the chapter and the framework we land on.

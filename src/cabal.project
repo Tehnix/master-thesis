@@ -3,4 +3,7 @@ packages:
           Unsafe/
           Rewrite/
           Template/
+          Preprocessor/
+          MonadTransformers/
+          FreerFun/
           Playground/

@@ -321,3 +321,7 @@ While there are many more interesting extensions and concepts in Haskell, this s
 
 [^1]: https://en.wikibooks.org/wiki/Haskell
 [^2]: http://learnyouahaskell.com/chapters
+
+
+## Summary
+TODO: Talk about what we learned in this chapter, and why we now think it makes sense to use purely functional programming languages.

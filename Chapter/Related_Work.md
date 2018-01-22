@@ -18,3 +18,6 @@ Explain MobiCOP from [@Benedetto2017].
 
 
 ## Common Design Limitations {#sec:related_limitations}
+
+
+## Summary
