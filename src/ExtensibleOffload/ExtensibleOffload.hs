@@ -3,7 +3,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE ConstraintKinds #-}
-module FreerFun where
+module ExtensibleOffload where
 
 import Control.Monad.Freer
 

@@ -193,14 +193,12 @@ One problem with this approach though is that we can only target specific functi
 
 ```{#lst:approaches_rewrite_simpleFunction .haskell}
 main :: IO ()
-main = do
-  print "Start:"
-  print $ simpleFunction 3
-  print "End!"
+main = print $ simpleFunction 3
 
 {-# RULES
 "simpleFunction/offload simpleFunction" forall x.
-    simpleFunction x = offloadFunction "simpleFunction" simpleFunction x
+    simpleFunction x = offloadFunction "simpleFunction"
+                                       simpleFunction x
   #-}
 
 simpleFunction :: Int -> [Int]
@@ -209,32 +207,30 @@ simpleFunction a = map (+a) $ map (+2) [1,2,3]
 
 : Rewrite rule for `simpleFunction` to wrap it in `offloadFunction`
 
-We can check that the rule has fired by running `stack exec -- ghc Main.hs -O2 -ddump-rule-firings` (or omit the `stack exec --` part if you are running plain \gls{ghc}), which yields,
+\ \
 
-```
+We can check that the rule has fired by running `stack exec -- ghc Main.hs -O2 -ddump-rule-firings` (or omit the `stack exec --` part if you are running plain \gls{ghc}), which yields the output in [@lst:approaches_rewrite_simpleFunction_output].
+
+```{#lst:approaches_rewrite_simpleFunction_output .haskell}
 ...
 Rule fired: map (GHC.Base)
 Rule fired: unpack (GHC.Base)
 Rule fired: Class op >>= (BUILTIN)
 Rule fired: Class op pure (BUILTIN)
-```
-```
 Rule fired: simpleFunction/offload simpleFunction (Main) <--- Our rule
-```
-```
 Rule fired: Class op show (BUILTIN)
 Rule fired: unpack (GHC.Base)
 Rule fired: unpack-list (GHC.Base)
 ...
 ```
 
-and running the program, combined with the code from [@lst:approaches_unsafe], gives us the following output,
+: Dump of the fired rewrite rules
+
+Running the program, combined with the code from [@lst:approaches_unsafe], gives us the following output,
 
 ```
-"Start:"
 "Offloading function..."
 [6,7,8]
-"End!"
 ```
 
 _Side-note:_ the reason we defined `simpleFunction` as `map (+a) $ map (+2) [1,2,3]` also serves to show that multiple rewrites will take place, since `map f (map g xs) == map (f . g) xs`.
@@ -251,14 +247,10 @@ An approach less radical than the others so far, is to utilize the structure of 
 
 ![Multiple interpreters from a single program](Graphic/Multiple Interpreters.png "Multiple interpreters from a single program"){#fig:approaches_monadic_multiple_interpreters width=60% }
 
-There are two popular styles of writing larger applications in Haskell, the first one, and by far most popular, is the \gls{mtl} style, and the second is using a concept known as `Free` monads. We will down into the second one, for reasons that shall become obvious as we go along.
+There are two popular styles of writing larger applications in Haskell, the first one, and by far most popular, is the \gls{mtl}-style, and the second is using a concept known as `Free` monads. Let us take a look at the \gls{mtl}-style of structuring programs first.
 
 
-<!--
 ### MTL-style
-TODO: Showcase how MTL can be used to separate the implementation and semantics, touch on the boilerplate problem (O(n*m) instances) and the lack of fine-grained control? Monad transformers arise because _Monads do not compose in general_.
-What does the `|` in `class MonadReader r m | m -> r` mean?
-
 Monad transformers came about because of a natural limitations of monads, namely that they do not compose. One way to mitigate this, is then to have a set of transformers that know how to go from one specific monad instance, to another.
 
 For example, from the \gls{mtl} we have the `Reader` monad as `MonadReader` with the interface for the monadic operations it support, and then instances for each monad it supports, including its own base case, `ReaderT`, as shown in [@lst:approaches_mtl_reader].
@@ -269,61 +261,102 @@ class MonadReader r m | m -> r where
 
 instance Monad m => MonadReader r (ReaderT r m) where
   ask = Control.Monad.Trans.ReaderT.ask
-
 instance (MonadReader r m) => MonadReader r (StateT s) where
   ask = lift ask
 ```
 
 : The `MonadReader` class and its instances for `ReaderT` and `StateT`
 
-We see that in the first instance---the base case---it simply uses the `ask` operation from `ReaderT` directly, but in the second instance, where `MonadReader` is wrapping `StateT`, it needs to life the ask operation once, because the ask operation will be called from inside the `StateT` monad, and therefore needs to bubble one level up.
+We see that in the first instance---the base case---it simply uses the `ask` operation from `ReaderT` directly, but in the second instance, where `MonadReader` is wrapping `StateT`, it needs to life the ask operation once, because the ask operation will be called from inside the `StateT` monad, and therefore needs to bubble one level up. We now have a general way of composing these transformers, at the expense of writing boilerplate code for the monads that we want to compose with. In fact, for every monad instance you add, you would need $n^2$ instances (at least if you want full composition). For example, to support `MonadReader` and `MonadState`, we need a base case for each and then an instance for `MonadState` supporting `ReaderT` and one for `MonadReader` supporting `StateT`. This can quickly grow, so we are getting this flexibility at the expense of setting up some boilerplate.
 
-This provides us with a general way of composing these transformers, at the expense of writing boilerplate code for the monads that we want to compose with. In fact, for every monad instance you add, you would need $n^2$ instances (at least if you want full composition). For example, to support `MonadReader` and `MonadState`, we need a base case for each and then an instance for `MonadState` supporting `ReaderT` and one for `MonadReader` supporting `StateT`. This can quickly grow, so we are getting this flexibility at the expense of setting up some boilerplate.
-
-\ \
-
-Going back to the task at hand, what we really want is a way to create operations---without specifying the type of effects---that can be abstracted over, and later on a concrete type can be choosen, depending on the place we want to use the program, be it client-side, testing or server-side.
-
-The way we would do this in the \gls{mtl}-style, is to have our operations as typeclass methods, and then instantiate it to the various types we need. For example, as shown in [@lst:approaches_mtl_effects], we could have our methods defined as a set of operations we can perform, collected in the typeclasses `MonadOperations` and `MonadRemotableOperations`.
+Going back to the task at hand, what we really want is a way to create operations---without specifying the type of effects---that can be abstracted over, and later on a concrete type can be choosen, depending on the place we want to use the program, be it client-side, testing or server-side. The way we would do this in the \gls{mtl}-style, is to have our operations as typeclass methods, as shown in [@lst:approaches_mtl_effects], collected in the typeclass `MonadEffects`.
 
 ```{#lst:approaches_mtl_effects .haskell}
-class Offload m where
-  offload :: (a -> b) -> a -> m b
-
-class MonadOperations m where
-  writeOutput :: String -> m ()
+class (Monad m) => MonadEffects m where
+  writeOutput :: Show a => a -> m ()
   getInput :: m String
-
-class (Offload m) => MonadRemotableOperations m where
   computation :: Int -> Int -> m Int
+  -- Provide a default implementation for empty instances.
+  default writeOutput :: (MonadTrans t, MonadEffects m', m ~ t m'
+                      , Show a) => a -> m ()
+  writeOutput = lift . writeOutput
+  default getInput :: (MonadTrans t, MonadEffects m', m ~ t m')
+                      => m String
+  getInput = lift getInput
+  default computation :: (MonadTrans t, MonadEffects m', m ~ t m')
+                         => Int -> Int -> m Int
+  computation i1 i2 = lift $ computation i1 i2
 ```
 
-: Modelling our operations as the typeclasses `MonadOperations` and `MonadRemotableOperations`
+: Defining our operations with `MonadEffects`
 
-We then do the instantiation, first for the server-side as shown in [@lst:approaches_mtl_effects_server], which will live in `IO`, and only needs to support `MonadRemotableOperations`,
-
-```{#lst:approaches_mtl_effects_server .haskell}
-instance (MonadIO m) => MonadRemoteOperations m where
-  computation i1 i2 = pure $ i1 + i2
+```{#lst:approaches_mtl_effects_mtl .haskell}
+instance MonadEffects m => MonadEffects (LoggingT m)
+instance MonadEffects m => MonadEffects (ReaderT r m)
+instance MonadEffects m => MonadEffects (StateT s m)
+instance (MonadEffects m, Monoid w) => MonadEffects (WriterT w m)
 ```
 
-: Instance for `MonadRemotableOperations` on the server-side
+: Default instances of `MonadEffects` to make it compatible with common MTL classes
 
-And the client-side, shown in [@lst:approaches_mtl_effects_client], needs to support both `MonadOperations` and `MonadRemotableOperations`.
+`MonadEffects` becomes our general program interface, exposing some of the operations we can exercise precise control over, depending on the environment they are running in. We fill in a bit of boilerplate by making some default implementations, marked by `default`, of each operations, so that we can derive a bunch of \gls{mtl} typeclasses in few lines, as shown in [@lst:approaches_mtl_effects_mtl].
 
-```{#lst:approaches_mtl_effects_client .haskell}
-instance (MonadIO m) =>  MonadOperations m where
-  writeOutput str = putStrLn str
-  getInput = getLine
+We can now provide two wrapper types around `IO`, also called carrier types, which will serve to make a distinction between our `MonadEffects` instance running on the client, and the one running on the server. We do this, as shown in [@lst:approaches_mtl_effects_wrappers], by making `newtype` wrappers around `IO`, providing a `runX` to unwrap it, and deriving some common classes.
 
-instance (MonadIO m) => MonadRemoteOperations m where
-  computation i1 i2 = pure $ i1 + i2
+```{#lst:approaches_mtl_effects_wrappers .haskell}
+-- Our client IO instances.
+newtype Client m a = Client { runClient :: m a }
+  deriving (Functor, Applicative, Monad, MonadIO)
+
+-- Our server IO instances.
+newtype Server m a = Server { runServer :: m a }
+  deriving (Functor, Applicative, Monad, MonadIO)
 ```
 
-: Instance for `MonadOperations` and `MonadRemotableOperations` on the client-side
--->
+: Our carrier types for the client and server respectively
 
-### Free style
+Before we can run the program, we need to make some concrete implementations of `MonadEffects` for each of these two carriers. We will do these fairly straightforward, as shown in [@lst:approaches_mtl_effects_instances].
+
+```{#lst:approaches_mtl_effects_instances .haskell}
+instance MonadEffects (Client IO) where
+  getInput = Client $ pure "Fake Input"
+  writeOutput = Client . print
+  computation i1 i2 = do
+    liftIO $ print "Offloading"
+    Client . pure $ i1 + i2
+
+instance MonadEffects (Server IO) where
+  getInput = Server $ pure "Fake Input"
+  writeOutput = Server . print
+  computation i1 i2 = Server . pure $ i1 + i2
+```
+
+: The concrete instances for our `Client` and `Server`
+
+Now we can finally write our program, which we can interpret both on the client and server side, as shown in [@lst:approaches_mtl_effects_program], sprinkled with a `Reader` to show that our boilerplate for the \gls{mtl} classes.
+
+```{#lst:approaches_mtl_effects_program .haskell}
+program :: (MonadEffects m, MonadReader Env m) => m ()
+program = do
+  env <- ask
+  inp <- getInput
+  writeOutput $ "Input: " ++ inp ++ ", Hostname: " ++ envHost env
+  res <- computation 12 22
+  writeOutput res
+
+data Env = Env { envHost :: String }
+
+main = do
+  runClient . runReaderT program $ Env { envHost = "localhost" }
+  runServer . runReaderT program $ Env { envHost = "remote" }
+```
+
+: Our program running both the client and server instances
+
+With this, we should have demonstrated how to structure a program, and separating the execution of these. Still, the separation does not feel as clean as we could wish for, and there is a lot of boilerplate involved (even though we cut down on this extensively). This actually brings us on to our next apporach; the `Free` monad.
+
+
+### Free Monads
 The `Free`-style of writing a program allows for a very clean separation of the semantics of the program and the interpretation of it, by first structuring a form of \gls{ast} of the program, and then constructing different interpreters depending on how you want to run the program.
 
 `Free` monads are a concept from category theory, which when used in Haskell gives us a monad for free for our data types, as long as we implement the functors for them ourselves. If you squint a bit, the data type for `Free`, shown in [@lst:approaches_free_definition], looks a lot like the data type for list, and in fact it is a fair intuition of how the structure of a program written in `Free`-style is built up.
@@ -398,18 +431,13 @@ testInterpreter :: Program next -> IO next
 testInterpreter (Pure a) = return a
 testInterpreter (Free effect) =
   case effect of
-    ReadFile filename next -> do
+    ReadFile filename next ->
       let fakeFileContent = "Test file content for: " ++ filename
-      testInterpreter $ next fakeFileContent
-    WriteOutput s next -> do
-      putStrLn s
-      testInterpreter next
-    WriteOutputInt i next -> do
-      print i
-      testInterpreter next
-    GetInput next -> do
-      let fakeInput = "Fake input"
-      testInterpreter $ next fakeInput
+      in testInterpreter $ next fakeFileContent
+    WriteOutput s next -> putStrLn s >> testInterpreter next
+    WriteOutputInt i next -> print i >> testInterpreter next
+    GetInput next -> let fakeInput = "Fake input"
+      in testInterpreter $ next fakeInput
     Computation i1 i2 next -> testInterpreter $ next (i1 + i2)
 ```
 
@@ -439,15 +467,15 @@ Test file content for: Fake input
 34
 ```
 
-Some quick notes, since creating functors and making the functions to lift our functors into monads are such frequently done, there is some machinery to make it a **lot** more ergonomic. We could replace the whole of [@lst:approaches_free_functors] with a `deriving (Functor)` on our data type and a `{-# LANGUAGE DeriveFunctor #-}` language pragma. Furthermore, by using Template Haskell, we could do away with [@lst:approaches_free_functions] (keeping the `Program` type alias) by using `makeFree ''Effects` along with a `{-# LANGUAGE TemplateHaskell #-}` language pragma at the top. This cuts down a lot on the tedious an erroneous parts of setting up a program using the `Free`-style.
+Some quick notes, since creating functors and making the functions to lift our functors into monads are done so frequently, there is some machinery to make it a _lot_ more ergonomic. We could replace the whole of [@lst:approaches_free_functors] with a `deriving (Functor)` on our data type and a `{-# LANGUAGE DeriveFunctor #-}` language pragma. Furthermore, by using Template Haskell, we could do away with [@lst:approaches_free_functions] (keeping the `Program` type alias) by using `makeFree ''Effects` along with a `{-# LANGUAGE TemplateHaskell #-}` language pragma at the top. This cuts down a lot on the tedious an erroneous parts of setting up a program using the `Free`-style.
 
 \ \
 
-There is one problem with `Free` though: it has terrible performance. Constantly doing `(f >>= g) >>= h` behaves as bad as `(a ++ b) ++ c` (i.e. list concatenation) performance-wise. This brings us to our next section on an improvement over `Free`, namely `Freer`.
+There is one problem with `Free` though: it has terrible performance. Constantly doing `(f >>= g) >>= h` behaves performance-wise as bad as `(a ++ b) ++ c`---that is, list concatenation. This brings us to our next section on an improvement over both the performance of `Free` and its interface, namely `Freer`.
 
 
-### Freer
-`Freer`, introduced in [@Kiselyov2015], changes up the exact way we go about creating our effects, but the overall idea is the same as `Free`---to create a clean separation between the program semantics and the implementation details.
+### Freer Monads
+`Freer`, introduced in [@Kiselyov2015], changes up the interface, but the overall idea is the same as `Free`---to create a clean separation between the program semantics and the implementation details.
 
 The first difference comes from our data type, which is now a \gls{gadt}, as shown in [@lst:approaches_freer_data]. This also gives us the power to use constraints on our types, and we can do away with the two `writeOutput` functions, and simply require the argument to be `Show`able.
 
@@ -486,7 +514,8 @@ We are now ready to write our interpreter, as shown in [@lst:approaches_freer_in
 ```{#lst:approaches_freer_interpreter .haskell}
 runEffect :: Eff '[Effect, IO] a -> IO a
 runEffect = runM . interpretM (\e -> case e of
-  ReadFilename filename -> pure $ "Test file content for: " ++ filename
+  ReadFilename filename -> pure $ "Test file content for: "
+                                  ++ filename
   WriteOutput s -> print s
   GetInput -> pure "Fake input"
   Computation i1 i2 -> pure $ i1 + i2)
@@ -507,7 +536,6 @@ program = do
  result <- computation 12 22
  writeOutput result
 
-main :: IO ()
 main = runEffect program
 ```
 
@@ -668,17 +696,9 @@ Let us first extend the `deriveOffload`, as shown in [@lst:approach_th_deriveoff
 ```{#lst:approach_th_deriveoffload_extended .haskell}
 extendedDeriveOffload :: Name -> Q Exp
 extendedDeriveOffload name = do
-  runIO storeMapping
-  [e| offloadFunction n $a |]
-  where
-    a = varE name
-    n = showName name
-    fileName = "FunctionMapping.txt"
-    storeMapping = do
-      fileExists <- doesFileExist fileName
-      if fileExists -- For now, the name and function are identical.
-        then appendFile fileName (n ++ ":" ++ n ++ "\n")
-        else writeFile fileName (n ++ ":" ++ n ++ "\n")
+  let n = showName name
+  runIO $ appendFile "FunctionMapping.txt" (n ++ ":" ++ n ++ "\n")
+  [e| offloadFunction n $(varE name) |]
 ```
 
 : Extending `deriveOffload` to write the function mappings to a file
@@ -688,21 +708,16 @@ We can now use this file in a later compilation process, to gather all the mappi
 ```{#lst:approach_th_deriveoffload_extended_generate_endpoints .haskell}
 deriveEndpoints :: String -> Q [Dec]
 deriveEndpoints path = do
+  let g (s:f:[]) = (LitP $ StringL s, VarE (mkName f))
   content <- runIO (readFile path)
   addDependentFile path -- Recompile on filechange.
+  lcBody <- [e|error "Undefined mapping"|]
   let mappings = map (splitOn ":") (lines content)
-  let name = mkName "endpoint" -- Set up all the cases.
-      patterns = map (fst . extractString) mappings
-      fnBodies = map (snd . extractString) mappings
-      clauses = zipWith (\body pat -> Clause [pat] (NormalB body) [])
-                                      fnBodies patterns
-  lastClauseBody <- [e|error "Undefined mapping"|]
-  let s' = mkName "s" -- Handle the catch-all last clause.
-      lastClause = [Clause [VarP s'] (NormalB lastClauseBody) []]
-  pure [FunD name (clauses ++ lastClause)]
-  where
-    extractString :: [String] -> (Pat, Exp)
-    extractString (s:f:[]) = (LitP $ StringL s, VarE (mkName f))
+      clauses = zipWith
+        (\body pat -> Clause [pat] (NormalB body) [])
+        (map (snd . g) mappings) (map (fst . g) mappings)
+      lastClause = [Clause [VarP (mkName "s")] (NormalB lcBody) []]
+  pure [FunD (mkName "endpoint") (clauses ++ lastClause)]
 ```
 
 : Generating endpoints from the data in the "FunctionMapping.txt" file
@@ -726,7 +741,11 @@ interpreterEndpoint (_,f) arg = do
     then setImports ["Prelude"]
     else setImports ["Prelude", moduleName]
   eval $ fnName ++ arg
+```
 
+: Interpreting incoming code on the server-side
+
+```{#lst:approach_th_hint_run .haskell}
 endpoint' :: (String, String) -> String -> IO String
 endpoint' (s,f) arg = do
   res <- runInterpreter $ interpreterEndpoint (s,f) arg
@@ -735,11 +754,7 @@ endpoint' (s,f) arg = do
       print err
       pure "Failed"
     Right e -> pure e
-```
 
-: Interpreting incoming code on the server-side
-
-```{#lst:approach_th_hint_run .haskell}
 main = do
   res <- endpoint' ("", "Unsafe.simpleFunction") " 3"
   print res
@@ -798,6 +813,15 @@ Extension
 [^man]: Manually controlled by adding function calls before the code that should be offloaded
 [^re]: Needs a rewrite rule for every function that should support offloading
 [^flex]: Very flexible granularity, since one can simply add more fine-grained effects if the offloading should be more fine-grainde
+
+### Honorable Mentions
+There were a few approaches we did not thoroughly inspect, but can somewhat quickly argue that their dismissal are justified.
+
+- **Manipulating the source**: This would involve preprocessing the Haskell source code, using something like `ghc-exactprint`[^ghcexactprint], and then add our offloading code (e.g. via `unsafePerformIO` again) in the \gls{ast} of the source code, before restructuring the program. This quite obviously seems like a brittle approach with very little control, with the complexity being in the mid-tier.
+- **Compiler/Language Extension**: Another approach left out was to create a language extension that could be turned on, and then would rewrite suitable functions to allow offloading. This was dismissed much for the same reasons as manipulating the source code.
+
+
+[^ghcexactprint]: https://hackage.haskell.org/package/ghc-exactprint
 
 
 ## Summary

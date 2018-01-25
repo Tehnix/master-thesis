@@ -1,4 +1,4 @@
-name:           MonadTransformers
+name:           ExtensibleOffload
 version:        0.1.0.0
 category:       Miscellaneous
 author:         Christian Kjaer Laustsen
@@ -10,10 +10,8 @@ cabal-version:  >= 2.0
 
 library
   exposed-modules:
-                       MonadTransformers
+                       ExtensibleOffload
   build-depends:       base >= 4.9 && < 5
-                     , mtl
-                     , transformers
-                     , monad-logger
+                     , freer-simple
   ghc-options:         -Wall
   default-language:    Haskell2010

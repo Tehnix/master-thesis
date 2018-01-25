@@ -22,18 +22,13 @@ testInterpreter :: Program next -> IO next
 testInterpreter (Pure a) = return a
 testInterpreter (Free effect) =
   case effect of
-    ReadFile filename next -> do
+    ReadFile filename next ->
       let fakeFileContent = "Test file content for: " ++ filename
-      testInterpreter $ next fakeFileContent
-    WriteOutput s next -> do
-      putStrLn s
-      testInterpreter next
-    WriteOutputInt i next -> do
-      print i
-      testInterpreter next
-    GetInput next -> do
-      let fakeInput = "Fake input"
-      testInterpreter $ next fakeInput
+      in testInterpreter $ next fakeFileContent
+    WriteOutput s next -> putStrLn s >> testInterpreter next
+    WriteOutputInt i next -> print i >> testInterpreter next
+    GetInput next -> let fakeInput = "Fake input"
+      in testInterpreter $ next fakeInput
     Computation i1 i2 next -> testInterpreter $ next (i1 + i2)
 
 pureStateInterpreter :: MonadState [String] m => Program next -> m next

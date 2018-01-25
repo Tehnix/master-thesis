@@ -7,7 +7,7 @@ import Language.Haskell.TH.Quote (QuasiQuoter(..))
 import Data.List (dropWhileEnd, dropWhile)
 import Data.Char (isSpace)
 
-import System.Directory (doesFileExist)
+-- import System.Directory (doesFileExist)
 import Data.List.Split (splitOn)
 
 import Unsafe (offloadFunction)
@@ -24,20 +24,9 @@ deriveOffload name =
 
 extendedDeriveOffload :: Name -> Q Exp
 extendedDeriveOffload name = do
-  runIO storeMapping
-  [e|
-    offloadFunction n $a
-    |]
-  where
-    a = varE name
-    n = showName name
-    fileName = "FunctionMapping.txt"
-    storeMapping = do
-      fileExists <- doesFileExist fileName
-      -- For now, the name and function are identical.
-      if fileExists
-        then appendFile fileName (n ++ ":" ++ n ++ "\n")
-        else writeFile fileName (n ++ ":" ++ n ++ "\n")
+  let n = showName name
+  runIO $ appendFile "FunctionMapping.txt" (n ++ ":" ++ n ++ "\n")
+  [e|offloadFunction n $(varE name)|]
 
 off :: QuasiQuoter
 off = QuasiQuoter
@@ -56,21 +45,14 @@ off = QuasiQuoter
 
 deriveEndpoints :: String -> Q [Dec]
 deriveEndpoints path = do
+  let g (s:f:[]) = (LitP $ StringL s, VarE (mkName f))
+      g _ = error "Incorrect mapping, should be 's:f'"
   content <- runIO (readFile path)
-  -- Recompile on filechange.
-  addDependentFile path
-  -- Set up all the cases.
+  addDependentFile path -- Recompile on filechange.
+  lcBody <- [e|error "Undefined mapping"|]
   let mappings = map (splitOn ":") (lines content)
-  let name = mkName "endpoint"
-      patterns = map (fst . extractString) mappings
-      fnBodies = map (snd . extractString) mappings
-      clauses = zipWith (\body pat -> Clause [pat] (NormalB body) []) fnBodies patterns
-  -- Handle the catch-all last clause.
-  lastClauseBody <- [e|error "Undefined mapping"|]
-  let s' = mkName "s"
-      lastClause = [Clause [VarP s'] (NormalB lastClauseBody) []]
-  pure [FunD name (clauses ++ lastClause)]
-  where
-    extractString :: [String] -> (Pat, Exp)
-    extractString (s:f:[]) = (LitP $ StringL s, VarE (mkName f))
-    extractString _ = error "Incorrect mapping, should be 's:f'"
+      clauses = zipWith
+        (\body pat -> Clause [pat] (NormalB body) [])
+        (map (snd . g) mappings) (map (fst . g) mappings)
+      lastClause = [Clause [VarP (mkName "s")] (NormalB lcBody) []]
+  pure [FunD (mkName "endpoint") (clauses ++ lastClause)]

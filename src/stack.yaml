@@ -8,3 +8,4 @@ packages:
 - MonadTransformers
 - FreerFun
 - Playground
+- ExtensibleOffload
