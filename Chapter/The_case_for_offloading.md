@@ -14,6 +14,11 @@ Take a look at [@Flores2013], and also the recommendations from [@Golkarifard201
 This goes back to [@Golkarifard2017], [@Jiao2013] and [@Nabi2015] again.
 
 
+
+[@Cuervo2010] In implementing MAUI, we discovered a number of unforeseen challenges to implementing program partitioning for mobile appli- cations. One such challenge is that using power-save mode (PSM) when transferring state remotely can hurt the overall energy con- sumption of the application when the latency to the server is low. Moreover, PSM mode helps save energy but only when latencies approach the sleep interval (today’s hardware uses 100 ms).
+They also mention that \gls{rtt} has significant impact on the energy consumption, especially as the data size goes up (see page no. 51).
+
+
 ### What about input/output size? {#sec:case_when_input}
 Again we go back to [@Golkarifard2017], [@Jiao2013] and [@Nabi2015] again.
 

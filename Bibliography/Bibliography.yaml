@@ -368,11 +368,36 @@ references:
   ISBN: '9781450330565'
   ISSN: '00010782'
 
-- type: article-journal
+- id: PowerManagement2016
+  type: article-journal
   issued:
   - year: '2016'
   title: '[Advanced Power Management Techniques for Mobile Communication Systems]{.nocase}'
   issue: February
+
+- id: Chun2009
+  type: article-journal
+  author:
+  - family: Chun
+    given: Byung-Gon;
+  - family: Maniatis
+    given: Petros
+  issued:
+  - year: '2009'
+  title: '[Augmented smartphone applications through clone cloud execution]{.nocase}'
+  container-title: HotOS’09 Proceedings of the 12th conference on Hot topics in operating
+    systems
+  page: '8'
+  abstract: Smartphones enable a new, rich user experience in pervasive computing,
+    but their hardware is still very limited in terms of computation, memory, and
+    energy reserves, thus limiting potential applications. In this paper, we propose
+    a novel architecture that addresses these challenges via seamlessly—but partially—off-loading
+    execution from the smartphone to a computational infrastructure hosting a cloud
+    of smartphone clones. We outline new augmented execution opportunities for smartphones
+    enabled by our CloneCloud architecture.
+  URL: http://dl.acm.org/citation.cfm?id=1855576{\%}5Cnhttp://static.usenix.org/events/hotos09/tech/full{\_}papers/chun/chun{\_}html/
+  DOI: 10.1046/j.1365-3083.1996.d01-77.x
+  ISSN: '15591662'
 
 - id: Kiselyov2015
   type: article-journal
