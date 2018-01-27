@@ -1,3 +1,8 @@
 {
-    "latex-workshop.debug.showUpdateMessage": false
+    "latex-workshop.debug.showUpdateMessage": false,
+    "cSpell.words": [
+        "cop",
+        "dalvik",
+        "mobi"
+    ]
 }

@@ -71,7 +71,7 @@ compose f g = f . g
 
 From the original paper [@Marlow2006] discussing the choice of using an _eval/apply_ evaluation model rather than _push/enter_, we get some estimates with regards to how many calls are actually to unknown functions, stating that on average the figure is around 20%. Conversely this means that 80% of calls should be to known functions, and we can therefore argue that an implementation should only look into supporting offloading for known function calls, which would cut down a little on the surface area of the implementation.
 
-While this may still seem like too coarse a granularity, one could eventually add support for pragmas that would mark a function as not offloadable (and offloadable for `IO` functions), as done in MAUI. This would entail propogating this information around the runtime.
+While this may still seem like too coarse a granularity, one could eventually add support for pragmas that would mark a function as not offloadable (and offloadable for `IO` functions), as done in MAUI. This would entail propagating this information around the runtime.
 
 \ \
 
@@ -87,13 +87,13 @@ Haskell is a very high-level language, and as such abstracts a lot of the nitty-
 - `unsafeDupablePerformIO` is a more efficient version of `unsafePerformIO` that lacks thread safety
 - `unsafeInterleaveIO` makes it possible to defer `IO` computations lazily, and as such is used to implement lazy file reading, for example
 
-The idea is to use `unsafePerformIO` inside function definitions, to decide whether to offload them or not. By iteself this would require manually sprinkling these calls around, but in combination with one of the other approaches, such as Rewrite Rules [@sec:approaches_rewrite] or Compiler/Language extensions [@sec:approaches_extension], this could be made feasible in an ergonomic way for the developer to use.
+The idea is to use `unsafePerformIO` inside function definitions, to decide whether to offload them or not. By itself this would require manually sprinkling these calls around, but in combination with one of the other approaches, such as Rewrite Rules [@sec:approaches_rewrite] or Compiler/Language extensions [@sec:approaches_extension], this could be made feasible in an ergonomic way for the developer to use.
 
 Now, one might ask "If you need to manually insert calls, why not use a regular function instead of `unsafePerformIO`?" which is indeed a valid question. The reasoning behind this is that we would like as much as possible to force functions into the `IO` monad, which did not need to be there in the first place, as it breaks down our ability to reason about our code (w.r.t. referential transparency), and means we would have to use monadic do-notation everywhere, making writing code quite tedious very quickly.
 
 \ \
 
-`unsafePerformIO` comes with some assumptions for it to work _safely_, such as not relying on any specific order of which the side-effects, in the function using `unsafePerformIO`, will be performed. That is, it is indeterministic, because of the call-by-need semantics of Haskell, which neither guarentees a function to ever be fully evaluated to normal form, nor that it will be evaluated at the place it is encountered. Furthermore, for the side-effects to not be optimized away, there are a few precautions, such as making sure the function is not inlined (via `{-# NOINLINE foo #-}` pragma), the expression is not eliminated (via the compiler flag `-fno-cse`) and making sure the call to `unsafePerformIO` is not floated outside a lambda.
+`unsafePerformIO` comes with some assumptions for it to work _safely_, such as not relying on any specific order of which the side-effects, in the function using `unsafePerformIO`, will be performed. That is, it is indeterministic, because of the call-by-need semantics of Haskell, which neither guarantees a function to ever be fully evaluated to normal form, nor that it will be evaluated at the place it is encountered. Furthermore, for the side-effects to not be optimized away, there are a few precautions, such as making sure the function is not inlined (via `{-# NOINLINE foo #-}` pragma), the expression is not eliminated (via the compiler flag `-fno-cse`) and making sure the call to `unsafePerformIO` is not floated outside a lambda.
 
 To address these assumptions, we mainly need to consider the first one, because the second one is mainly an implementation detail. Luckily we do not care about neither the order of evaluation, nor if it ever gets evaluated (in fact, that is only a good thing), because of the inherent goal of offloading is to save the device from executing code. This means that Haskell's call-by-need semantics is very well suited for the goal of offloading.
 
@@ -134,9 +134,9 @@ The code does the following:
     - a call to `unsafePerformIO`, with `offload` taking care of performing the actual network calls to offload, which needs to be synchronous/blocking\
     - the `f a` function itself, if it should not have offloaded
 
-Admittedly a lot of implementation details are left out, but the underlying concept should still be present in the code. This implementation would allow us to do something like `offloadFunction "heavyComputation" heavyComputation input`, which will then take care of either offloading the funtion, getting back its input and returning that, or simply returning the function application as would happen in normal code.
+Admittedly a lot of implementation details are left out, but the underlying concept should still be present in the code. This implementation would allow us to do something like `offloadFunction "heavyComputation" heavyComputation input`, which will then take care of either offloading the function, getting back its input and returning that, or simply returning the function application as would happen in normal code.
 
-One thing to note, as Haskell is currently, there is no way to serialize or get the name of a function at runtime, which we would need to be able to tell the server exactly what code it needs to run (i.e. what function to call). This gives us a bit of an akward interface to the function, as shown in [@lst:approaches_unsafe_run].
+One thing to note, as Haskell is currently, there is no way to serialize or get the name of a function at runtime, which we would need to be able to tell the server exactly what code it needs to run (i.e. what function to call). This gives us a bit of an awkward interface to the function, as shown in [@lst:approaches_unsafe_run].
 
 ```{#lst:approaches_unsafe_run .haskell}
 main :: IO ()
@@ -242,7 +242,7 @@ Adding calls to offload functions are indeed doable using rewrite rules, and als
 [^psrewrite]: https://github.com/purescript/purescript/issues/2749
 
 
-## Mondic Framework {#sec:approaches_monadic}
+## Monadic Framework {#sec:approaches_monadic}
 An approach less radical than the others so far, is to utilize the structure of the program itself to enable separating the interpretation/implementation of the program---and thereby the effects---from the semantics of the program itself. This can be done thanks to the way monadic computations are done, by forming a sequence of actions to be performed. This effectively allows us to, as shown in [@fig:approaches_monadic_multiple_interpreters], having multiple ways of interpreting the same program, depending on what we want from it. We could have a pure interpretation for testing, which allows us to, say, store the program output as a list of strings and inspect it later on. Or, a debug interpreter that allows us to step through the program sequences, or just an effectful interpreter running the actual program.
 
 ![Multiple interpreters from a single program](Graphic/Multiple Interpreters.png "Multiple interpreters from a single program"){#fig:approaches_monadic_multiple_interpreters width=60% }
@@ -269,7 +269,7 @@ instance (MonadReader r m) => MonadReader r (StateT s) where
 
 We see that in the first instance---the base case---it simply uses the `ask` operation from `ReaderT` directly, but in the second instance, where `MonadReader` is wrapping `StateT`, it needs to life the ask operation once, because the ask operation will be called from inside the `StateT` monad, and therefore needs to bubble one level up. We now have a general way of composing these transformers, at the expense of writing boilerplate code for the monads that we want to compose with. In fact, for every monad instance you add, you would need $n^2$ instances (at least if you want full composition). For example, to support `MonadReader` and `MonadState`, we need a base case for each and then an instance for `MonadState` supporting `ReaderT` and one for `MonadReader` supporting `StateT`. This can quickly grow, so we are getting this flexibility at the expense of setting up some boilerplate.
 
-Going back to the task at hand, what we really want is a way to create operations---without specifying the type of effects---that can be abstracted over, and later on a concrete type can be choosen, depending on the place we want to use the program, be it client-side, testing or server-side. The way we would do this in the \gls{mtl}-style, is to have our operations as typeclass methods, as shown in [@lst:approaches_mtl_effects], collected in the typeclass `MonadEffects`.
+Going back to the task at hand, what we really want is a way to create operations---without specifying the type of effects---that can be abstracted over, and later on a concrete type can be chosen, depending on the place we want to use the program, be it client-side, testing or server-side. The way we would do this in the \gls{mtl}-style, is to have our operations as typeclass methods, as shown in [@lst:approaches_mtl_effects], collected in the typeclass `MonadEffects`.
 
 ```{#lst:approaches_mtl_effects .haskell}
 class (Monad m) => MonadEffects m where
@@ -353,7 +353,7 @@ main = do
 
 : Our program running both the client and server instances
 
-With this, we should have demonstrated how to structure a program, and separating the execution of these. Still, the separation does not feel as clean as we could wish for, and there is a lot of boilerplate involved (even though we cut down on this extensively). This actually brings us on to our next apporach; the `Free` monad.
+With this, we should have demonstrated how to structure a program, and separating the execution of these. Still, the separation does not feel as clean as we could wish for, and there is a lot of boilerplate involved (even though we cut down on this extensively). This actually brings us on to our next approach; the `Free` monad.
 
 
 ### Free Monads
@@ -552,9 +552,9 @@ exactly like `Free`.
 
 \ \
 
-We have now seen a way we can structure our program so that we can seperate our semantics from our implementation, giving us great freedom in moving bits of the program execution around as we see fit. We can choose certain effects to be offloadable, and then have more or less the same interpreter on the server-side, just without the choice to offload. Another benefit is that data types are serializable, whereas functions are not. We have seen this problem arise for example in [@sec:approaches_unsafe], where we had to pass a `String` with the function name/id on, so that we could identify it on the server-side.
+We have now seen a way we can structure our program so that we can separate our semantics from our implementation, giving us great freedom in moving bits of the program execution around as we see fit. We can choose certain effects to be offloadable, and then have more or less the same interpreter on the server-side, just without the choice to offload. Another benefit is that data types are serializable, whereas functions are not. We have seen this problem arise for example in [@sec:approaches_unsafe], where we had to pass a `String` with the function name/id on, so that we could identify it on the server-side.
 
-We gain a lot for very little real complexity, while also maintaining an approach that is both easily adoptable---and in fact already in use, albeit for different goals---and also very portable to other languages, with sufficient enough type systems (like Idris or PureScript). We have a server-side story, and a flexible coarsing for choosing what to offload.
+We gain a lot for very little real complexity, while also maintaining an approach that is both easily adoptable---and in fact already in use, albeit for different goals---and also very portable to other languages, with sufficient enough type systems (like Idris or PureScript). We have a server-side story, and a flexible graining for choosing what to offload.
 
 <!-- ## Manipulate the Source {#sec:approaches_source} -->
 <!-- TODO: Explain how to use e.q. `haskell-src-exts` or `ghc-exactprint` to extract the AST, add the offloading function, and output the program. Preproccessing to be exact.
@@ -593,7 +593,7 @@ debug [d|
 
 [^debug]: https://hackage.haskell.org/package/debug
 
-The `[d| ... |]` is quatation syntax for producing a declaration, and has the type `Q [Dec]`. There is also `[t| ... |]` giving `Q Type` for types, `[p| ... |]` giving `Q Pat` for patterns and finally `[e| ... |]` (or simply `[| ... |]`) giving `Q Exp` for expressions. An example, shown in [@lst:approach_th_runq_e], would be running our offload function call through the expressions quasiquoter, to generate the Template Haskell \gls{ast} for us.
+The `[d| ... |]` is quotation syntax for producing a declaration, and has the type `Q [Dec]`. There is also `[t| ... |]` giving `Q Type` for types, `[p| ... |]` giving `Q Pat` for patterns and finally `[e| ... |]` (or simply `[| ... |]`) giving `Q Exp` for expressions. An example, shown in [@lst:approach_th_runq_e], would be running our offload function call through the expressions quasiquoter, to generate the Template Haskell \gls{ast} for us.
 
 ```{#lst:approach_th_runq_e .haskell}
 *Main> runQ [e| offloadFunction "simpleFunction" simpleFunction 3 |]
@@ -620,7 +620,7 @@ So, let us set up some design goals for our \gls{th} system; we want it to,
 - remove duplicate (and thereby error-prone) arguments when calling the offloading function, and
 - help us with the server-side of things.
 
-To do this, we could imagine making a \gls{th} function, that will simply take in the function, and its arguments, add the `offloadFunction` and neccessary additional arguments in front, and create a mapping stating what name it passed on to `offloadFunction` and which function this should call on the server-side.
+To do this, we could imagine making a \gls{th} function, that will simply take in the function, and its arguments, add the `offloadFunction` and necessary additional arguments in front, and create a mapping stating what name it passed on to `offloadFunction` and which function this should call on the server-side.
 
 We tackle the first goal, by creating a function that will automatically lookup the name of the function, and construct the actual expression for `offloadFunction`. The \gls{th} code to derive this is shown in [@lst:approach_th_deriveoffload].
 
@@ -689,7 +689,7 @@ Currently we win very little, other than removing the chance of giving the wrong
 
 \ \
 
-We would like our server-side routing function to act as an entry point for the server-side, and then have a mapping of `String`s to actual functions. If we could make sure a piece of \gls{th} code ran at the end, we could build up a list of function names to functions, but unfortunately we have no guarentee of order in the compilation. So, we need to divide up our compilation processes into a client compilation, which features the `deriveOffload` code, and a server compilation, which would construct the endpoint from the information made available from the finished client compilation. As such, one way to go about it is to generate a file consisting of all the mappings we need, and then have the server compilation read in this file and generate the Haskell code, via \gls{th}, that we need.
+We would like our server-side routing function to act as an entry point for the server-side, and then have a mapping of `String`s to actual functions. If we could make sure a piece of \gls{th} code ran at the end, we could build up a list of function names to functions, but unfortunately we have no guarantee of order in the compilation. So, we need to divide up our compilation processes into a client compilation, which features the `deriveOffload` code, and a server compilation, which would construct the endpoint from the information made available from the finished client compilation. As such, one way to go about it is to generate a file consisting of all the mappings we need, and then have the server compilation read in this file and generate the Haskell code, via \gls{th}, that we need.
 
 Let us first extend the `deriveOffload`, as shown in [@lst:approach_th_deriveoffload_extended], to also write out the mapping in a file, in the format of `functionString:function`, separating each mapping by a newline.
 
@@ -710,7 +710,7 @@ deriveEndpoints :: String -> Q [Dec]
 deriveEndpoints path = do
   let g (s:f:[]) = (LitP $ StringL s, VarE (mkName f))
   content <- runIO (readFile path)
-  addDependentFile path -- Recompile on filechange.
+  addDependentFile path -- Recompile on file change.
   lcBody <- [e|error "Undefined mapping"|]
   let mappings = map (splitOn ":") (lines content)
       clauses = zipWith
@@ -763,11 +763,11 @@ main = do
 : Running the interpreter on incoming code on the server-side
 
 
-The endpoint takes in the code, passes it on to the interpreter, which splits it up and loads the module for the function, afterwhich it evaluates it with arguments. The endpoint then returns this result as a `String`, from which we can return it to the client, and the client can handle the type casting to the correct type.
+The endpoint takes in the code, passes it on to the interpreter, which splits it up and loads the module for the function, after which it evaluates it with arguments. The endpoint then returns this result as a `String`, from which we can return it to the client, and the client can handle the type casting to the correct type.
 
 \ \
 
-Through all of this, we have seen that \gls{th} offers a lot of opportunities, but at the cost of quite some complexity. A thing to note is that \gls{th} is known not to be very portable across hardware architectures, and this might pose a bigger problem, then simply how we get the pieces to fit, if we wanted to use it. The buy-in is fairly low, since it would need to be manually added, which also means the granularity is very fine-coarsed.
+Through all of this, we have seen that \gls{th} offers a lot of opportunities, but at the cost of quite some complexity. A thing to note is that \gls{th} is known not to be very portable across hardware architectures, and this might pose a bigger problem, then simply how we get the pieces to fit, if we wanted to use it. The buy-in is fairly low, since it would need to be manually added, which also means the granularity is very fine-grained.
 
 
 [^hint]: https://hackage.haskell.org/package/hint
@@ -812,13 +812,13 @@ Extension
 [^pure]: All pure _known_ functions with saturated arguments
 [^man]: Manually controlled by adding function calls before the code that should be offloaded
 [^re]: Needs a rewrite rule for every function that should support offloading
-[^flex]: Very flexible granularity, since one can simply add more fine-grained effects if the offloading should be more fine-grainde
+[^flex]: Very flexible granularity, since one can simply add more fine-grained effects if the offloading should be more fine-grained
 
 ### Honorable Mentions
-There were a few approaches we did not thoroughly inspect, but can somewhat quickly argue that their dismissal are justified.
+There were a few approaches we did not thoroughly inspect, but are still worth mentioning:
 
 - **Manipulating the source**: This would involve preprocessing the Haskell source code, using something like `ghc-exactprint`[^ghcexactprint], and then add our offloading code (e.g. via `unsafePerformIO` again) in the \gls{ast} of the source code, before restructuring the program. This quite obviously seems like a brittle approach with very little control, with the complexity being in the mid-tier.
-- **Compiler/Language Extension**: Another approach left out was to create a language extension that could be turned on, and then would rewrite suitable functions to allow offloading. This was dismissed much for the same reasons as manipulating the source code.
+- **Compiler/Language Extension**: Another approach left out was to create a language extension that could be turned on, and then would rewrite suitable functions to allow offloading. This would have very little portability across languages, and would entail a bit of complexity while giving little control to the developer.
 
 
 [^ghcexactprint]: https://hackage.haskell.org/package/ghc-exactprint
