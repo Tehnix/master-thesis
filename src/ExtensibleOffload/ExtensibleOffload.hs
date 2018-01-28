@@ -28,13 +28,15 @@ getInput = send GetInput
 computation :: Member Effect effs => Int -> Int -> Eff effs Int
 computation i1 i2 = send $ Computation i1 i2
 
-runEffect :: Eff '[Effect, IO] a -> IO a
+runEffect :: (Monad m) => Eff '[Effect, m] a -> m a
 runEffect = runM . interpretM (\case
   ReadFilename filename -> pure $ "Test file content for: " ++ filename
-  WriteOutput s -> print s
+  WriteOutput s -> do
+    -- print s
+    pure ()
   GetInput -> pure "Fake input"
   Computation i1 i2 -> do
-    print "Imagine the offloading happening here"
+    --  print "Imagine the offloading happening here"
     pure $ i1 + i2)
 
 program :: Eff '[Effect, IO] ()

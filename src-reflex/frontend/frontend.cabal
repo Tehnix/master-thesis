@@ -8,23 +8,30 @@ build-type:          Simple
 extra-source-files:  ChangeLog.md
 cabal-version:       >=1.24
 
--- build-type: Custom
--- custom-setup
---   setup-depends: base
---                , Cabal
---                , cabal-macosx
 
--- executable frontend-warp
---   main-is:             MainWarp.hs
---   build-depends:       base
---                      , common
---                      , reflex-dom
---                      , jsaddle-warp
---                      , reflex-dom-core
---   hs-source-dirs:      src
---   default-language:    Haskell2010
---   ghc-options: -threaded
---                -dynamic
+executable frontend
+  main-is:             Main.hs
+  hs-source-dirs:      src
+  build-depends:       base
+                     , common
+                     , reflex-dom
+                     , jsaddle-warp
+                     , reflex-dom-core
+                     , freer-simple
+                     , containers
+  default-extensions:  GADTs
+                       LambdaCase
+                       OverloadedStrings
+                       RecursiveDo
+                       ScopedTypeVariables
+                       DataKinds
+  default-language:    Haskell2010
+  if impl(ghcjs)
+    ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N -dynamic -dedupe
+  else
+    ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N -dynamic
+  if impl(ghcjs)
+        cpp-options: -DGHCJS_BROWSER
 
 -- executable frontend-webkitgtk
 --   if impl(ghcjs)
@@ -39,30 +46,30 @@ cabal-version:       >=1.24
 --   default-language:    Haskell2010
 --   ghc-options: -threaded
 
-executable frontend-wkwebview
-  if !os(osx) || impl(ghcjs)
-      buildable: False
-  main-is:             MainWebView.hs
-  build-depends:       base
-                     , common
-                     , reflex-dom
-                     , jsaddle-wkwebview
-                     , reflex-dom-core
-  hs-source-dirs:      src
-  default-language:    Haskell2010
-  ghc-options: -threaded
-               -dynamic
+-- executable frontend-wkwebview
+--   if !os(osx) || impl(ghcjs)
+--       buildable: False
+--   main-is:             MainWebView.hs
+--   build-depends:       base
+--                      , common
+--                      , reflex-dom
+--                      , jsaddle-wkwebview
+--                      , reflex-dom-core
+--   hs-source-dirs:      src
+--   default-language:    Haskell2010
+--   ghc-options: -threaded
+--                -dynamic
 
 
-executable frontend-wkwebview-ios
-  if os(osx) || impl(ghcjs)
-      buildable: False
-  main-is:             MainWebView.hs
-  build-depends:       base
-                     , common
-                     , reflex-dom
-                     , jsaddle-wkwebview
-                     , reflex-dom-core
-  hs-source-dirs:      src
-  default-language:    Haskell2010
-  ghc-options: -threaded
+-- executable frontend
+--   if os(osx) || impl(ghcjs)
+--       buildable: False
+--   main-is:             MainWebView.hs
+--   build-depends:       base
+--                      , common
+--                      , reflex-dom
+--                      , jsaddle-wkwebview
+--                      , reflex-dom-core
+--   hs-source-dirs:      src
+--   default-language:    Haskell2010
+--   ghc-options: -threaded

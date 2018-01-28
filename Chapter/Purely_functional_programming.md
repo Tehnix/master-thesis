@@ -1,9 +1,9 @@
-# Pure Functional Programming {#cha:purely_functional}
-In this chapter, we will explore what it means to be a _purely functional programming language_, and what consequences that has for program design. If the reader is closely familiar with pure functional programming e.g. via Haskell, Idris, PureScript, Elm or similar, these concepts should already be familiar to the user, and they can safely skip this chapter.
+# Pure Functional Programming {#ch:purely_functional}
+In this chapter, we will explore what it means to be a _purely functional programming language_, and what consequences is has for program design.
 
 
 ## Functional programming {#sec:purely_functional_programming}
-Functional programming is a paradigm, under the declarative programming paradigm, which stands heavily in contrast to imperative programming, positioning itself in the opposite end of the spectrum. Whereas an imperative program can be seen as a series of state changing steps, functional programming treats computations as evaluations of mathematical expressions. Boiling it down to the essentials, a functional language is basically an extension of lambda-calculus, with some added constructs to make the language richer. Common for functional languages are that they support concepts such as first-class functions, i.e. support for passing functions around as arguments, and higher-order functions, which are functions that can take other functions as input, or even return a function. The astute reader might recognize these concepts if they have played with something like Python, JavaScript or Ruby (and many other languages), and they would be right, seeing as functional programming concepts have spread out into mainstream languages more and more. An example of first-class functions in first Python and then Haskell are shown in [@lst:fist_class_functions_python] and [@lst:fist_class_functions_haskell] (both run in their respective REPLs),
+Functional programming is a paradigm, under the declarative programming paradigm, which stands heavily in contrast to imperative programming, positioning itself in the opposite end of the spectrum. Whereas an imperative program can be seen as a series of state changing steps, functional programming treats computations as evaluations of mathematical expressions. Boiling it down to the essentials, a functional language is an extension of lambda-calculus, with some added constructs to make the language richer. Common for functional languages are that they support concepts such as first-class functions, i.e. support for passing functions around as arguments, and higher-order functions, which are functions that can take other functions as input, or even return a function. The astute reader might recognize these concepts if they have experience with something like Python, JavaScript or Ruby (and many other languages), and they would be right seeing as functional programming concepts have spread out into mainstream languages more and more. An example of first-class functions in first Python and then Haskell are shown in [@lst:fist_class_functions_python] and [@lst:fist_class_functions_haskell] (both run in their respective REPLs).
 
 ```{#lst:fist_class_functions_python .python}
 >>> def add3(a): return a + 3
@@ -27,17 +27,17 @@ A functional programming language can be said to be a language that primarily in
 
 
 ## Pure vs Impure {#sec:purely_functional_purity}
-Now that we have an idea of what a functional language is, we can talk about _purity_ and _impurity_. When we say a language is pure or impure, we are in essence describing how we treat computational effects, such as I/O. In [@Sabry1998] the author tries to come up with a formal definition of what it means to be pure,
+Now that we have an idea of what a functional language is, we can talk about _purity_ and _impurity_. When we say a language is pure or impure, we are in essence describing how we treat computational effects, such as I/O. In [@Sabry1998] the author tries to come up with a formal definition of what it means to be pure.
 
 > _In essence, the new definition asserts that a language is purely functional if it can be implemented using either call-by-value, call-by-need, or call-by-name, with no observable difference between the different strategies -- other than termination properties._ [@Sabry1998, p.1]
 
 Which we can interpret as: no matter how many times you evaluate a function (as would happen with call-by-name), or when you evaluate them (call-by-need vs call-by-value), _iff_ they are pure, it will not matter since given the same input a function would give the same output, barring of course non-termination.
 
-More informally, and what is usually also the more popular and simple explanation, is that a purity means that we get referential transparency, as we know it from mathematics. This was championed by John Launchbury and Simon Peyton Jones in [@Launchbury1995].
+More informally, and what is usually also the more popular and simple explanation, is that purity means that we get referential transparency, as we know it from mathematics. This was championed by John Launchbury and Simon Peyton Jones in [@Launchbury1995].
 
 \ \
 
-To reword the above in perhaps a more digestible way, for a function to be referentially transparent: if a function receives the same input, it must produce the same output. Take for example the code shown in [@lst:referential_transparency_python] and [@lst:referential_transparency_haskell].
+To reword the above in perhaps a more digestible way, if a function receives the same input, it must produce the same output, then we can consider the function to be referentially transparent. Take for example the code shown in [@lst:referential_transparency_python] and [@lst:referential_transparency_haskell].
 
 ```{#lst:referential_transparency_python .python}
 def appendList(a, b):
@@ -53,7 +53,7 @@ appendList a b = a ++ b
 
 : Example of a referentially transparent function in Haskell
 
-No matter how many times we we give the arguments `[1,2,3]` and `[4,5,6]` the result will be `[1,2,3,4,5,6]`. This is something that we can guarantee in the types of the Haskell code, but only something we can assume in the Python code, since it is untyped. Similarly, the statically type Java language would also only hold assumptions, and no guarantees, since in Java we have no way of talking about effects. This is where Haskell and similar purely functional languages, which has seemed quite similar so far, diverges!
+No matter how many times we give the arguments, `[1,2,3]` and `[4,5,6]`, the result will be `[1,2,3,4,5,6]`. This is something that we can guarantee in the types of the Haskell code, but only something we can assume in the Python code, since it is untyped. Similarly, the statically type Java language would also only hold assumptions, and no guarantees, since in Java we have no way of talking about effects. This is where Haskell and similar purely functional languages, which have seemed quite similar so far, diverge!
 
 ```{#lst:impure_haskell .haskell}
 appendList :: [a] -> [a] -> IO [a]
@@ -65,14 +65,14 @@ appendList a b = do
 
 : An impure function in Haskell
 
-In [@lst:impure_haskell] we note the return type of the function has become `IO [a]`. Why is that? If we inspect the function itself, we see that we suddenly added a `print` statement inside the function definition. The `print` function has the type `print :: Show a => a -> IO ()` which means it takes a _showable_ value, performs an I/O operation and finally returns `()` (called unit, which is an empty value). By using `print` inside of `appendList`, the type system now requires `appendList` to be marked as working inside I/O as well---it is by this mechanism that we can guarantee that a function that does not have any I/O in its type signature will not perform any side-effects---or as a popular saying in the Haskell community "It will not launch nukes", in the context of running a pure function.
+In [@lst:impure_haskell] we note that the return type of the function has become `IO [a]`. Why is that? If we inspect the function itself, we see that we suddenly added a `print` statement inside the function definition. The `print` function has the type `print :: Show a => a -> IO ()` which means it takes a _showable_ value, performs an I/O operation and finally returns `()` (called unit, which is an empty value). By using `print` inside of `appendList`, the type system now requires `appendList` to be marked as working inside I/O as well---it is by this mechanism that we can guarantee that a function which does not have any I/O in its type signature will not perform any side-effects---or as a popular saying in the Haskell community "It will not launch nukes", in the context of running a pure function.
 
-Interestingly, in [@Jiao2013], the authors actually bring up the topic of using functional programming languages---referencing Haskell in their sources---exactly because of this trait. The authors propose that the fact that there is no global state and mutability, because of purity, and that code re-execution is safe, because of referential transparency, that this would solve, or at least alleviate, several problems in MAUI and CloneCloud (which were the ones out at the time of the paper):
+Interestingly, in [@Jiao2013], the authors actually bring up the topic of using functional programming languages, referencing Haskell in their sources, exactly because of this trait. The authors propose that because there is no global state and mutability---because of purity---and that code re-execution is safe---because of referential transparency---this would solve, or at least alleviate, several problems in MAUI and CloneCloud (which were the ones out at the time of the paper):
 
 - It would remove the need for shipping all variables and objects to the server, in case they are needed.
 - Code re-execution, which was a restriction of MAUI, is now safe to do.
 
-Unfortunately, there has not been any follow-up work done capitalizing on these ideas, which in part is what motivated this thesis.
+Unfortunately, there has not been any follow-up work done capitalizing on these ideas, which is in part is what motivated this thesis.
 
 
 ## Lazy vs Strict Evaluation {#sec:purely_functional_lazy}
@@ -98,7 +98,7 @@ add 5 12
 
 : Strict evaluation sequence
 
-We see that arguments are evaluated before being passed into the function. Some arguments will be passed as references, commonly arrays and dictionaries, in some language that mix in call-by-reference. That said, it is not a requirement from strict evaluation at all. Now if we contrast this with lazy evaluation, we end up with a sequence as shown in [@lst:evaluation_sequence_lazy].
+We see that arguments are evaluated before being passed into the function. Some arguments will be passed as references, commonly arrays and dictionaries, in some language that mixes in call-by-reference. That said, it is not a requirement from strict evaluation at all. Now if we contrast this with lazy evaluation, we end up with a sequence as shown in [@lst:evaluation_sequence_lazy].
 
 ```{#lst:evaluation_sequence_lazy .haskell}
 add (2+3) (4*3)
@@ -117,7 +117,7 @@ add (2+3) (4*3)
 
 The lazy evaluation leaves us with a pointer, called a thunk, which points to the computation. Only when we actually need the value inside the computation, say if we later decide to `print` it, do we perform the actual evaluation. Typically this is implemented as call-by-need, which means that it only evaluates the computation when it needs it, and additionally, memoizes the value so it does not need to reevaluate it on subsequent calls (in contrast to call-by-name, which evaluates the computation every time).
 
-One thing to note about the use thunks/laziness is that it inherently makes reasoning about performance harder, particularly reasoning about space, since thunks can build up and consume a ton of additional memory. There are common strategies to fix this problem, such as marking a data type as strict, or forcing the evaluation to normal form.
+One thing to note about the use of thunks/laziness is that it inherently makes reasoning about performance harder, particularly reasoning about space, since thunks can build up and consume additional memory (i.e. space leaks). There are common strategies to fix this problem, such as marking a data type as strict, or forcing the evaluation to normal form.
 
 \ \
 
@@ -133,7 +133,7 @@ Prelude> take 5 infList
 
 
 ## Primer on Haskell {#sec:purely_functional_primer}
-With our theoretical background on some of the core concepts of purely functional programming languages, we can move on to a specific one in the category, namely Haskell. Haskell is a lazy-evaluated purely functional programming, that was a unification of several research projects and attempts at lazily-evaluated languages, made by the Haskell working group in around 1990.
+With our theoretical background on some of the core concepts of purely functional programming languages, we can move on to a specific one in the category, namely Haskell. Haskell is a lazy-evaluated purely functional programming language, that was a unification of several research projects and attempts at lazily-evaluated languages, made by the Haskell working group in around 1990.
 
 Haskell is strongly statically typed, and features a type system with type inference. This means that type annotations are not required, except to resolve ambiguity for the type system when multiple typing judgements are valid. That said, it is still common practice to annotate functions with type signatures, as they very much help documenting the code.
 
@@ -150,7 +150,7 @@ add a b = a + b
 
 The first line, `add :: Int -> Int -> Int`, is the type signature. Since Haskell is based on the lambda-calculus, it uses a concept called currying to allow multiple arguments into a function, since a lambda-expression only really takes one argument in. While in lambda-calculus we might write $\lambda a. \lambda b. a + b$, we see this concept mostly in the type signature with $\lambda a$ being the first `Int`, $\lambda b$ being the second, and finally the returned value `a+b` is represented by the third and final `Int`.
 
-On the second line, `add a b = a + b`, we have the function definition, which declares a function, `add`, which takes two arguments, `a` and `b`, and then in the function body it returns `a + b`. In Haskell the last expression in the function body is the one that is returned by the function.
+On the second line, `add a b = a + b`, we have the function definition, which declares a function, `add`, which takes two arguments, `a` and `b`, and then in the function body it returns `a + b`. In Haskell, the last expression in the function body is the one that is returned by the function.
 
 ### Data Types
 
@@ -168,7 +168,7 @@ readEmail (Email email) = print email
 
 : Using newtypes to distinguish between an email and a username
 
-You are now able to force any consumer of your program \gls{api} to be aware if they are supplying an email or username, instead of simply accepting any form of `String`ly value.
+You are now able to force any consumer of your program \gls{api} to be aware if they are supplying an email or username, instead of simply accepting any form of stringly typed value.
 
 Data types come in handy when we want to express multiple states, options or similar, such as a traffic light, as shown in [@lst:primer_data_types].
 
@@ -206,7 +206,7 @@ Some commonly used typeclasses are `Show` for converting items into a `String`, 
 
 
 ### Monads
-Quickly moving on, Haskell introduces a syntactic sugar for sequencing actions via _monads_, called _do-notation_, demonstrated in [@lst:primer_haskell_do]. Monads are essentially just a typeclass, as we'll see in [@lst:primer_monads], and the do-notation uses the `>>=` operator, called _bind_, to sequence actions, and `return`/`pure` to put something into a monad, and `join` to collapse a monad from e.g. `m (m value)` to `m value`, where `m` would be a type variable for a monad.
+Quickly moving on, Haskell introduces a syntactic sugar for sequencing actions via _monads_, called _do-notation_, demonstrated in [@lst:primer_haskell_function]. Monads are essentially just a typeclass, as we'll see in [@lst:primer_monads], where do-notation uses the `>>=` operator, called _bind_, to sequence actions, `return`/`pure` to put something into a monad, and `join` to collapse a monad from e.g. `m (m value)` to `m value`, where `m` would be a type variable for a monad.
 
 ```{#lst:primer_haskell_function .haskell}
 tellTheWorld :: IO ()
@@ -256,7 +256,7 @@ For example, the `State` monad exposes `get` and `put` for getting the monad val
 
 ### Language Extensions
 
-The GHC compiler is very often a target for research, and as such gets a lot of experimental of new features implemented in the language as language extensions. These are either enabled using pragmas, or by adding a flag in the project settings. Take for example a common extension `OverloadedStrings`, which provide a way for string literals to be parametrically polymorphic, by allowing anything that implements `IsString` to be a string literal, as shown in [@lst:primer_overloadedstrings].
+The GHC compiler is very often a target for research, and as such gets a lot of experimental new features implemented in the language as language extensions. These are either enabled using pragmas, or by adding a flag in the project settings. Take for example a common extension `OverloadedStrings`, which provides a way for string literals to be parametrically polymorphic, by allowing anything that implements `IsString` to be a string literal, as shown in [@lst:primer_overloadedstrings].
 
 
 ```{#lst:primer_overloadedstrings .haskell}
@@ -276,11 +276,11 @@ byteString = "A fast byte implementation of strings"
 
 : Using the `OverloadedStrings` language extension
 
-This makes it convenient to work with other string types, since `String` is not the most performant, seeing as it is implemented using linked-lists. There are a ton of other language extensions too, that add to the syntax, add features to the type system and many other things (`FlexibleInstances`, `GADTs`, `RankNTypes`, etc)
+This makes it convenient to work with other string types, since `String` is not the most performant, seeing as it is implemented using linked-lists. There are many of other language extensions too, that add to the syntax, add features to the type system and many other things (`FlexibleInstances`, `GADTs`, `RankNTypes`, etc).
 
 
 ### Pragmas
-Pragmas are a way to instruct the GHC compiler to do something special for certain code. For example, you can tell GHC to force inline a function by adding `{-# INLINE function_name #-}` (or not to via `NOINLINE`). There are a bunch of pragmas (language extensions are also a pragma), such as `SPECIALIZE` which allows you to specialize a function to a specific type, etc.
+Pragmas are a way to instruct the GHC compiler to do something special for certain code. For example, you can tell GHC to force inline a function by adding `{-# INLINE function_name #-}` (or not to via `NOINLINE`). There are a many pragmas (language extensions are also pragmas), such as `SPECIALIZE` which allows you to specialize a function to a specific type, etc.
 
 One of particular interest is `RULES` which allow you to specify rewrite rules for code that match the \gls{lhs} of the rule with the code on the \gls{rhs} of the rule. Take for example the canonical rewrite rule, shown in [@lst:primer_rewrite], which states that if you have a `map` that applies a function, `f`, to the result of another `map` that applies the function, `g`, to a list, `xs`, is equivalent to applying `f . g` (the `.` operator composes two functions together) directly to the elements in `xs`. This means that instead of two list traversals, we now just have one.
 
@@ -309,7 +309,7 @@ data Program
 
 : A program as a data type
 
-This leaves us with a problem though: the `Equality` constructor clearly is expecting a `Boolean`, while the `Addition` constructor is expecting a `Value`. When we later have to implement our evaluator for this program, we will run into trouble with this. But what if we could specify the return and input types of the program? In comes \glspl{gadt} to the rescue, as shown in [@lst:primer_gadts].
+This however leaves us with a problem: the `Equality` constructor is clearly expecting a `Boolean`, while the `Addition` constructor is expecting a `Value`. When we later have to implement our evaluator for this program, we will run into trouble with this. But what if we could specify the return and input types of the program? In comes \glspl{gadt} to the rescue, as shown in [@lst:primer_gadts].
 
 ```{#lst:primer_gadts .haskell}
 data Program a
@@ -324,7 +324,7 @@ data Program a
 
 \ \
 
-While there are many more interesting extensions and concepts in Haskell, this should be provide the bare necessities for understanding the rest of the thesis---after all, this is not meant to be a tutorial on programming languages. For a more in-depth overview of Haskell, there are multiple resources online, such as the _Haskell Wiki Book_[^1], _Learn You a Haskell For Great Good_[^2] and many more.
+While there are many more interesting extensions and concepts in Haskell, this should provide the bare necessities for understanding the rest of the thesis---after all, this is not meant to be a tutorial on programming languages. For a more in-depth overview of Haskell, there are multiple resources online, such as the _Haskell Wiki Book_[^1], _Learn You a Haskell For Great Good_[^2], and many more.
 
 
 [^1]: https://en.wikibooks.org/wiki/Haskell
@@ -332,8 +332,8 @@ While there are many more interesting extensions and concepts in Haskell, this s
 
 
 ## Summary
-A purely functional programming language is one that creates a separation between effectful and non-effectful code. It contains the concept, at the type level, of purity and side-effects. This means that one can guarantee that a function, given the same input, will always return the same output---in other words, we gain referential transparency.
+A purely functional programming language is language that creates a separation between effectful and non-effectful code. It contains the concept, at the type level, of purity and side-effects. This means that one can guarantee that a function, given the same input, will always return the same output---in other words, we gain referential transparency.
 
-There are two main evaluation models in functional programming languages, lazy and strict. Most language opt to go for strict evaluation, because it is by far the simplest to implement, but there are some that go for the lazy evaluation model---or rather, call-by-need---namely Haskell.
+There are two main evaluation models in functional programming languages: lazy and strict. Most language opt to go for strict evaluation, because it is by far the simplest to implement, but there are some that go for the lazy evaluation model---or rather, call-by-need---namely Haskell.
 
 Haskell is a lazy purely functional programming language, with an advanced type system, providing strong static guarantees about our programs, and giving us a way to model a lot of our logic in the type system, so as to let the compiler help catch errors for the programmer. It gives us these tools via data types, \glspl{gadt}, ad-hoc polymorphism using typeclasses, monads and other powerful abstractions.

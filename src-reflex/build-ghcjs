@@ -1,1 +1,14 @@
-nix-shell -A shells.ghcjs --run "cabal --project-file=cabal-ghcjs.project --builddir=dist-ghcjs new-build all"
+if ((${#NIX_GHCJS[@]})); then
+  #if [[ -v NIX_GHCJS ]]; then
+  buildDir="dist-ghcjs/build/x86_64-osx/ghcjs-0.2.1/frontend-0.1.0.0/c/frontend/build/frontend/frontend.jsexe"
+  echo $buildDir
+  cabal --project-file=cabal-ghcjs.project --builddir=dist-ghcjs new-build all #\
+    #&& ccjs $buildDir/rts.js --compilation_level=ADVANCED_OPTIMIZATIONS > $buildDir/rts.js \
+    #&& ccjs $buildDir/lib.js --compilation_level=ADVANCED_OPTIMIZATIONS > $buildDir/lib.js \
+    #&& ccjs $buildDir/out.js --compilation_level=ADVANCED_OPTIMIZATIONS > $buildDir/out.js \
+    #&& ccjs $buildDir/runmain.js --compilation_level=ADVANCED_OPTIMIZATIONS > $buildDir/runmain.js
+else
+  #nix-shell -A shells.ghcjs --run "cabal --project-file=cabal-ghcjs.project --builddir=dist-ghcjs new-build all"
+  nix-shell -A shells.ghcjs
+fi
+

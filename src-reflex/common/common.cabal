@@ -10,7 +10,12 @@ cabal-version:       >=1.10
 
 
 library
-  exposed-modules:    Common
-  build-depends:       base
   hs-source-dirs:      src
+  exposed-modules:    Common.Operations
+                    , Common.Types
+  build-depends:      base
+                    , freer-simple
   default-language:    Haskell2010
+  default-extensions:  GADTs
+                       LambdaCase
+                       DataKinds

@@ -16,7 +16,9 @@ references:
   issue: January
 
 - id: CommentaryFunction
-  type: no-type
+  type: report
+  author:
+  - literal: GHC Commentary
   accessed:
   - year: '2018'
     month: '1'
