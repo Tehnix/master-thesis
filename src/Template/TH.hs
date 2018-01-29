@@ -25,7 +25,8 @@ deriveOffload name =
 extendedDeriveOffload :: Name -> Q Exp
 extendedDeriveOffload name = do
   let n = showName name
-  runIO $ appendFile "FunctionMapping.txt" (n ++ ":" ++ n ++ "\n")
+  -- Uncomment the line below to create the "FunctionMapping.txt" file.
+  --runIO $ appendFile "FunctionMapping.txt" (n ++ ":" ++ n ++ "\n")
   [e|offloadFunction n $(varE name)|]
 
 off :: QuasiQuoter
