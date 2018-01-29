@@ -18,34 +18,53 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <containerView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ulB-5F-oiE">
+                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ulB-5F-oiE">
                                 <rect key="frame" x="0.0" y="20" width="375" height="408"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                                 <connections>
                                     <segue destination="hX1-m8-sUO" kind="embed" id="LZg-Lw-Tmb"/>
                                 </connections>
                             </containerView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Nx8-Sg-jZB">
-                                <rect key="frame" x="100" y="436" width="174" height="29"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Nx8-Sg-jZB">
+                                <rect key="frame" x="64" y="436" width="311" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mbk-F7-BP1">
-                                <rect key="frame" x="100" y="482" width="174" height="29"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Offload Counter: 👍 0 / 0 ✋" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="uua-TU-rKr">
+                                <rect key="frame" x="16" y="626" width="343" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mbk-F7-BP1">
+                                <rect key="frame" x="64" y="436" width="247" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="trailing" secondItem="ulB-5F-oiE" secondAttribute="trailing" id="20s-ug-9ZK"/>
+                            <constraint firstItem="Nx8-Sg-jZB" firstAttribute="top" secondItem="ulB-5F-oiE" secondAttribute="bottom" constant="8" id="2Iz-Uw-MM3"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="uua-TU-rKr" secondAttribute="bottom" constant="20" id="3jh-vI-6fZ"/>
+                            <constraint firstItem="uua-TU-rKr" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="Di8-qZ-APT"/>
+                            <constraint firstItem="ulB-5F-oiE" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="FWo-3K-SVJ"/>
+                            <constraint firstAttribute="bottom" secondItem="ulB-5F-oiE" secondAttribute="bottom" constant="239" id="FYl-7Z-2ty"/>
+                            <constraint firstItem="Mbk-F7-BP1" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="64" id="JGd-gg-1hM"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="Mbk-F7-BP1" secondAttribute="trailing" constant="64" id="NRL-Df-CWS"/>
+                            <constraint firstItem="Mbk-F7-BP1" firstAttribute="top" secondItem="ulB-5F-oiE" secondAttribute="bottom" constant="8" id="cdp-ho-whj"/>
+                            <constraint firstItem="ulB-5F-oiE" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="gk0-RP-jR5"/>
+                            <constraint firstItem="Nx8-Sg-jZB" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="v59-PR-l5A"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="uua-TU-rKr" secondAttribute="trailing" constant="16" id="vOa-tb-4jf"/>
+                            <constraint firstItem="Nx8-Sg-jZB" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="64" id="vr3-nC-50D"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
                         <outlet property="containerView" destination="ulB-5F-oiE" id="R6O-PT-MTZ"/>
                         <outlet property="firstLabel" destination="Nx8-Sg-jZB" id="sYB-nm-9be"/>
+                        <outlet property="offloadCounter" destination="uua-TU-rKr" id="IJl-xt-XCK"/>
                         <outlet property="secondLabel" destination="Mbk-F7-BP1" id="Rkd-OI-dzh"/>
                     </connections>
                 </viewController>

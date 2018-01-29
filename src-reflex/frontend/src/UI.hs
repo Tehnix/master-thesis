@@ -18,7 +18,6 @@ headElem = do
 
 bodyElem :: MonadWidget t m => m ()
 bodyElem = elClass "div" "main-component" $ do
-  rec
-    el "h1" $ text "Welcome to Offie The Offloader"
-    el "p" $ text "Tests will start automatically."
+  el "h1" $ text "Welcome to Offie The Offloader"
+  el "p" $ text "Tests will start automatically."
   blank

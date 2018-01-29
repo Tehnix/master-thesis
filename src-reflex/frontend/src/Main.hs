@@ -6,6 +6,7 @@ import Reflex.Dom.Core (mainWidgetWithHead)
 
 import UI
 import Interpreter
+import JavaScriptFFI (logToiOS, setiOSLabel1, setiOSLabel2)
 import Common.Operations
 import Common.Types
 import Control.Monad.Freer
@@ -13,9 +14,12 @@ import Control.Monad.Freer
 
 main :: IO ()
 main = do
+  logToiOS "Initializing app"
+  setiOSLabel1 ""
+  setiOSLabel2 ""
   concurrently_
     (runProgramM program)
-    (JSaddle.run 3709 $ mainWidgetWithHead headElem bodyElem)
+    (JSaddle.run 3710 $ mainWidgetWithHead headElem bodyElem)
 
 program :: Eff '[Operation, Computation, IO] ()
 program = do

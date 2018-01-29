@@ -1,6 +1,0 @@
-if ((${#NIX_GHC[@]})); then
-  cabal new-build all
-else
-  #nix-shell -A shells.ghc --run "cabal new-build all"
-  nix-shell -A shells.ghc
-fi

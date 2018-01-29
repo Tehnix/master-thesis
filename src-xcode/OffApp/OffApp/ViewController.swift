@@ -15,16 +15,24 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
     @IBOutlet var containerView: UIView!
     @IBOutlet var firstLabel: UILabel!
     @IBOutlet var secondLabel: UILabel!
+    @IBOutlet var offloadCounter: UILabel!
+    var offloadNo: Int = 0
+    var localNo: Int = 0
     
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         if message.name == "log" && message.body is String {
             print(message.body)
-        }
-        if message.name == "labelOne" && message.body is String {
+        } else if message.name == "labelOne" && message.body is String {
             firstLabel.text = message.body as? String
-        }
-        if message.name == "labelTwo" && message.body is String {
+        } else if message.name == "labelTwo" && message.body is String {
             secondLabel.text = message.body as? String
+        } else if message.name == "offloadCounter" && message.body is String {
+            if message.body as? String == "1" {
+                offloadNo += 1
+            } else {
+                localNo += 1
+            }
+            offloadCounter.text = "Offload Counter: 👍 \(offloadNo) / \(localNo) ✋"
         }
     }
     
@@ -43,6 +51,15 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
                 userController.add(
                     self as WKScriptMessageHandler,
                     name: "log")
+                userController.add(
+                    self as WKScriptMessageHandler,
+                    name: "labelOne")
+                userController.add(
+                    self as WKScriptMessageHandler,
+                    name: "labelTwo")
+                userController.add(
+                    self as WKScriptMessageHandler,
+                    name: "offloadCounter")
                 webConfig.userContentController = userController;
                 return webConfig;
             }

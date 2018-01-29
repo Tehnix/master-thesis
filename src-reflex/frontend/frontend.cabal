@@ -15,6 +15,7 @@ executable frontend
                      , Interpreter
                      , JavaScriptFFI
                      , Profiler
+                     , Offloader
   hs-source-dirs:      src
   if impl(ghcjs)
     build-depends:     base
@@ -26,9 +27,10 @@ executable frontend
                      , freer-simple
                      , containers
                      , lifted-async
-                     , wreq
+                     , req
+                     , data-default-class
                      , bytestring
-                     , lens
+                     , text
                      , ghcjs-base
   else
     build-depends:     base
@@ -40,9 +42,10 @@ executable frontend
                      , freer-simple
                      , containers
                      , lifted-async
-                     , wreq
+                     , req
+                     , data-default-class
                      , bytestring
-                     , lens
+                     , text
   default-extensions:  GADTs
                        LambdaCase
                        OverloadedStrings
