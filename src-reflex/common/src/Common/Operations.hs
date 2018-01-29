@@ -5,14 +5,12 @@ import Control.Monad.Freer
 
 import Common.Types
 
-readFilename :: Member Effect effs => String -> Eff effs String
-readFilename = send . ReadFilename
 
-writeOutput :: (Member Effect effs, Show a) => a -> Eff effs ()
+writeOutput :: (Member Operation effs, Serialize a) => a -> Eff effs ()
 writeOutput = send . WriteOutput
 
-getInput :: Member Effect effs => Eff effs String
-getInput = send GetInput
+isPrime :: Member Computation effs => Int -> Eff effs Bool
+isPrime = send . IsPrime
 
-computation :: Member Effect effs => Int -> Int -> Eff effs Int
-computation i1 i2 = send $ Computation i1 i2
+factorialLength :: Member Computation effs => Int -> Eff effs Int
+factorialLength = send . FactorialLength

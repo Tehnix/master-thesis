@@ -27,7 +27,11 @@ author:
 date: 2017-01-28
 tags: [mobile computation, offloading, haskell, dtu, kaist]
 abstract: |
-  Abstract coming later...
+  We continue to push the limits of mobile devices, but not all components can keep up with the speed of development and the demand for more processing power on-device. Battery life have not increased along with the power requirements, creating a need for methods that can preserve energy while still providing the processing power that consumers demand.
+
+  Offloading of computations is not a new idea, but it still has not seen a major breakthrough. In this thesis we investigate why, when and where it is beneficial to offload computations, based on the available literature. We take a look at existing systems and previous work to discern why their popularity has not reached the mainstream audience of developers, along with looking at the design limitations and considerations that went into the systems.
+
+  We use this knowledge to explore different approaches to offloading, and fianlly settle on one, which we then implement as a proof-of-concept.
 preface: |
   This thesis was written...
 thesis:

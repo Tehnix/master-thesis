@@ -1,12 +1,11 @@
 html, body {
     background: white;
-    height: 90%;
-    width: 100%;
+    font-size: 30px;
+    font-family: '-apple-system','HelveticaNeue';
 }
 .main-component {
     position: absolute;
-    top:0;
-    bottom: 0;
+    top:10%;
     left: 0;
     right: 0;
     margin: auto;
@@ -16,7 +15,10 @@ html, body {
 }
 
 h1 {
-    font-size: 3rem;
-    font-family: '-apple-system','HelveticaNeue';
+    font-size: 4rem;
     font-weight: lighter;
+}
+p {
+    font-size: 2rem;
+    font-weight: 300;
 }

@@ -5,6 +5,4 @@ Chapter/Purely_functional_programming.md
 Chapter/Approaches_to_offloading.md
 Chapter/Offloading_using_a_monadic_framework.md
 Chapter/Evaluation_and_Discussion.md
-Chapter/Future_work.md
-Chapter/Conclusion.md
 Chapter/Bibliography.md
