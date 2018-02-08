@@ -5,5 +5,17 @@
         "dalvik",
         "mobi",
         "stringly"
-    ]
+    ],
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/dist": true,
+        "**/dist-newstyle": true,
+        "**/dist-ghcjs": true,
+        "src-reflex/ios-result": true,
+        "src-reflex/result": true,
+        "**/.DS_Store": true
+    }
 }

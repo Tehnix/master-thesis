@@ -1,0 +1,22 @@
+-- This is a GHC environment file written by cabal. This means you can
+-- run ghc or ghci and get the environment of the project as a whole.
+-- But you still need to use cabal repl $target to get the environment
+-- of specific components (libs, exes, tests etc) because each one can
+-- have its own source dirs, cpp flags etc.
+-- 
+clear-package-db
+global-package-db
+package-db /Users/tehnix/.cabal/store/ghc-8.4.0.20180109/package.db
+package-db dist-newstyle/packagedb/ghc-8.4.0.20180109
+package-id MobileFun-0.1.0.0-inplace
+package-id base-4.11.0.0
+package-id rts-1.0
+package-id ghc-prim-0.5.2.0
+package-id integer-simple-0.1.1.1
+package-id frr-smpl-1.0.1.1-5504f9dc
+package-id ntrl-trnsfrmtn-0.4-e0a74fcb
+package-id trnsfrmrs-bs-0.4.4-4d613bec
+package-id stm-2.4.4.1
+package-id array-0.5.2.0
+package-id transformers-0.5.4.0
+package-id trnsfrmrs-cmpt-0.5.1.4-bf6ecf2f

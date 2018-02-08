@@ -1,15 +1,3 @@
-thesis.pdf
-Appendix/Original Latex
-Appendix/Thesis Template
-.tex
-.DS_Store
-.stack-work
-src-reflex/dist-ghcjs
-src-reflex/dist
-src-reflex/dist-newstyle
-src-reflex/ios-result
-src-reflex/result
-
 dist-newstyle/
 dist/
 binaries/

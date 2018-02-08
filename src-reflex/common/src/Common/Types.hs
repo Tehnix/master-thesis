@@ -1,8 +1,7 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE GADTs #-}
 module Common.Types where
-
-import Servant (FromHttpApiData, parseUrlPiece)
 
 
 type Serialize a = Show a
@@ -20,18 +19,11 @@ data Computation next where
 -- TODO: Derive `ComputationS`, the `Show` instance, and `FromHttpApiData
 -- from `Computation`, instead of this error-prone approach.
 
+data SComputation
+  = SIsPrime
+  | SFactorialLength
+
 -- | Convert our `Computation` GADT into the corresponding `SComputation`.
 instance Show (Computation n) where
-  show (IsPrime i) = "IsPrimeS"
-  show (FactorialLength i) = "FactorialLengthS"
-
--- | Server-side representation.
-data ComputationS
-  = IsPrimeS
-  | FactorialLengthS
-
--- | Allow servent to decode the `SComputation` string into the constructor.
-instance FromHttpApiData ComputationS where
-  parseUrlPiece "IsPrimeS" = Right IsPrimeS
-  parseUrlPiece "FactorialLengthS" = Right FactorialLengthS
-  parseUrlPiece _ = Left "Error: Unknown"
+  show (IsPrime i) = "IsPrime"
+  show (FactorialLength i) = "FactorialLength"

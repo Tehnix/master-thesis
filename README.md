@@ -58,6 +58,8 @@ The `src-reflex/` folder contains the code for chapter 5, showcasing a proof-of-
 ### src-xcode/ code
 The `src-xcode/` folder contains the Xcode project, which constructs a mix of a WebView and some labels that the code can interact with. JavaScript can communicate to the Swift code via GHCJS's JavaScript FFI, and some minor setup in the `ViewController.swift` in Xcode. This is described in the last part of section 5.4.
 
+Additionally it contains another Xcode project, `Offie`, which demonstrates how to compile Haskell on a mobile device. For a more in-depth explanation of this, check out [this blog post](https://codetalk.io/posts/2018-02-07-Mobile-Haskell.html) on Mobile Haskell (iOS).
+
 
 ### src-etlas/ code
 The `src-xcode/` folder contains the beginning of an Android project that would have used [Eta-lang](https://eta-lang.org), which is basically Haskell on the JVM. This was explored in parallel with the reflex-dom approach, but was dropped because of time constraints, and limited resources on how to integrate the two (i.e. Eta and Android).

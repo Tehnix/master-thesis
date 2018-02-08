@@ -1,6 +1,11 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeOperators #-}
-{-# LANGUAGE StandaloneDeriving #-}
+{-# LANGUAGE GADTs #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE Rank2Types #-}
+{-# LANGUAGE ImpredicativeTypes #-}
+{-# LANGUAGE LiberalTypeSynonyms #-}
 module Main where
 
 import Servant
@@ -16,9 +21,15 @@ import Common.Computation
 main :: IO ()
 main = run 8080 (serve api server)
 
+-- | Allow servent to decode the `Computation` string into the constructor. We supply a
+-- throwaway value for the constructors to make them compile.
+instance FromHttpApiData SComputation where
+  parseUrlPiece "IsPrime" = Right SIsPrime
+  parseUrlPiece "FactorialLength" = Right SFactorialLength
+  parseUrlPiece _ = Left "Error: Unknown"
 
 type OffloadApi
-  = "off" :> Capture "f" ComputationS :> Capture "v" Int :> Get '[PlainText] String
+  = "off" :> Capture "f" SComputation :> Capture "v" Int :> Get '[PlainText] String
 
 api :: Proxy OffloadApi
 api = Proxy
@@ -26,7 +37,7 @@ api = Proxy
 server :: Server OffloadApi
 server = compute
   where
-    compute :: ComputationS -> Int -> Handler String
-    compute f val = pure $ case f of
-      IsPrimeS -> show $ computeIsPrime val
-      FactorialLengthS -> show $ computeFactorialLength val
+    compute :: SComputation -> Int -> Handler String
+    compute f val = return $ case f of
+      SIsPrime -> show $ computeIsPrime val
+      SFactorialLength -> show $ computeFactorialLength val

@@ -1,0 +1,52 @@
+resolver: lts-8.11
+packages:
+- '.'
+- ../common
+- location:
+    git: https://github.com/reflex-frp/reflex-dom
+    commit: 212dca4b7ff323dca423f2dd934341bdee7ea2c5
+    subdirs:
+      - reflex-dom-core
+      - reflex-dom
+- location:
+    git: https://github.com/reflex-frp/reflex
+    commit: 8e0177ff28c25436452dba1222cbf8d1a20424fd
+- location:
+   git: https://github.com/ghcjs/ghcjs-base.git
+   commit: 552da6d30fd25857a2ee8eb995d01fd4ae606d22
+- location:
+    git: https://github.com/ghcjs/ghcjs-dom
+    commit: c8dd7fce6144131673f600d2d50666e75822f8be
+    subdirs:
+      - ghcjs-dom
+      - ghcjs-dom-jsffi
+      - ghcjs-dom-jsaddle
+
+extra-deps:
+  - dependent-sum-template-0.0.0.6
+  - jsaddle-0.9.2.1
+  - jsaddle-warp-0.9.5.0
+  - reflex-dom-0.3
+  - prim-uniq-0.1.0.1
+  - ref-tf-0.4.0.1
+  - freer-simple-1.0.0.0
+  - aeson-0.11.3.0
+  - base-4.8.2.0
+  - data-default-0.5.3
+  - dependent-sum-0.3.2.2
+  - directory-1.2.7.1
+  - ghcjs-dom-0.2.4.0
+  - lens-4.13.2.1
+  - reflex-0.4.0.1
+  - these-0.6.2.1
+  - time-1.5.0.1
+  - transformers-0.4.3.0
+
+compiler: ghcjs-0.2.1.9008011_ghc-8.0.2
+compiler-check: match-exact
+setup-info:
+  ghcjs:
+    source:
+      ghcjs-0.2.1.9008011_ghc-8.0.2:
+        url: https://github.com/matchwood/ghcjs-stack-dist/raw/master/ghcjs-0.2.1.9008011.tar.gz
+        sha1: a72a5181124baf64bcd0e68a8726e65914473b3b

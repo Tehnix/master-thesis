@@ -13,7 +13,6 @@ executable backend
   main-is:             Main.hs
   build-depends:       base
                      , common
-                     , reflex-dom
                      , freer-simple
                      , servant
                      , servant-server

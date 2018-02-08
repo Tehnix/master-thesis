@@ -16,7 +16,6 @@ library
                     , Common.Computation
   build-depends:      base
                     , freer-simple
-                    , servant-server
   default-language:    Haskell2010
   default-extensions:  GADTs
                        LambdaCase
