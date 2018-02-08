@@ -13,8 +13,8 @@ data Operation next where
   WriteOutput :: Serialize a => a -> Operation ()
 
 data Computation next where
-  IsPrime :: Int -> Computation Bool
-  FactorialLength :: Int -> Computation Int
+  IsPrime :: Integer -> Computation Bool
+  FactorialLength :: Integer -> Computation Int
 
 -- TODO: Derive `ComputationS`, the `Show` instance, and `FromHttpApiData
 -- from `Computation`, instead of this error-prone approach.

@@ -2,6 +2,7 @@
 module Interpreter where
 
 import Control.Monad.Freer
+import Control.Monad.IO.Class (liftIO)
 
 import Common.Types
 import Common.Computation
@@ -23,13 +24,15 @@ runComputationM = interpretM $ \case
     mComputation <- offload (serialize p) (serialize i)
     let computation = case mComputation of
           Nothing -> computeIsPrime i
-          Just c -> maybe False id ((readMaybe c) :: Maybe Bool)
+          Just mSC ->  maybe False id ((readMaybe (read mSC :: String)) :: Maybe Bool)
+    liftIO . logToiOS $ "Computation is: " ++ show computation
     setiOSLabel1 $ show computation
     pure computation
   p@(FactorialLength i) -> do
     mComputation <- offload (serialize p) (serialize i)
     let computation = case mComputation of
           Nothing -> computeFactorialLength i
-          Just c -> maybe 0 id ((readMaybe c) :: Maybe Int)
+          Just mSC ->  maybe (-1) id ((readMaybe (read mSC :: String)) :: Maybe Int)
+    liftIO . logToiOS $ "Computation is: " ++ show computation
     setiOSLabel2 $ show computation
     pure computation

@@ -6,7 +6,7 @@
   };
 
   shells = {
-    ghc = ["common" "backend" "frontend"];
+    ghc = ["common" "backend"];
     ghcjs = ["common" "frontend"];
   };
 

@@ -31,6 +31,7 @@ executable frontend
                      , bytestring
                      , text
                      , ghcjs-base
+                     , ghcjs-xhr
   else
     build-depends:     base
                      , common
@@ -43,6 +44,7 @@ executable frontend
                      , lifted-async
                      , bytestring
                      , text
+                     , ghcjs-xhr
   default-extensions:  GADTs
                        LambdaCase
                        OverloadedStrings

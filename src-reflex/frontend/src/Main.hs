@@ -26,4 +26,5 @@ program = do
  fac <- factorialLength 22
  writeOutput fac
  result <- isPrime 12
+ _ <- isPrime 29
  writeOutput result

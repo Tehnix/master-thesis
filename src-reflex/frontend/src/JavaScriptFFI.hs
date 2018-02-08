@@ -23,7 +23,7 @@ foreign import javascript unsafe
   iOSLabel2 :: JSString -> IO ()
 
 foreign import javascript unsafe
-  "if (typeof window.webkit.messageHandlers.labelTwo === 'undefined') { window.webkit.messageHandlers['offloadCounter'] = {postMessage: console.log }}; window.webkit.messageHandlers.offloadCounter.postMessage($1)"
+  "if (typeof window.webkit.messageHandlers.offloadCounter === 'undefined') { window.webkit.messageHandlers['offloadCounter'] = {postMessage: console.log }}; window.webkit.messageHandlers.offloadCounter.postMessage($1)"
   iOSOffloadCounter :: JSString -> IO ()
 
 logToiOS :: String -> IO ()
