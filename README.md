@@ -62,7 +62,7 @@ Additionally it contains another Xcode project, `Offie`, which demonstrates how 
 
 
 ### src-etlas/ code
-The `src-xcode/` folder contains the beginning of an Android project that would have used [Eta-lang](https://eta-lang.org), which is basically Haskell on the JVM. This was explored in parallel with the reflex-dom approach, but was dropped because of time constraints, and limited resources on how to integrate the two (i.e. Eta and Android).
+The `src-etlas/` folder contains the beginning of an Android project that would have used [Eta-lang](https://eta-lang.org), which is basically Haskell on the JVM. This was explored in parallel with the reflex-dom approach, but was dropped because of time constraints, and limited resources on how to integrate the two (i.e. Eta and Android).
 
 
 ## Compiling the Thesis
