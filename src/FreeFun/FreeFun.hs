@@ -1,8 +1,8 @@
 module FreeFun where
 
-import Control.Monad.State
-import qualified ManualFree as MF
+import           Control.Monad.State
 import qualified DerivedFree as DF
+import qualified ManualFree as MF
 
 
 manualProgram :: MF.Program ()
@@ -27,5 +27,6 @@ main = do
   MF.testInterpreter manualProgram
   print "Derived setup free:"
   DF.testInterpreter derivedProgram
+  print "Derived setup free with pure interpreter:"
   (_, dfState) <- runStateT (DF.pureStateInterpreter derivedProgram) []
   print dfState

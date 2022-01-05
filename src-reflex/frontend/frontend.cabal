@@ -5,7 +5,6 @@ license-file:        LICENSE
 author:              Christian Kjaer Laustsen
 maintainer:          ckl@codetalk.io
 build-type:          Simple
-extra-source-files:  ChangeLog.md
 cabal-version:       >=1.24
 
 

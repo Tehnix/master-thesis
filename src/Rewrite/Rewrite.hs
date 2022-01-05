@@ -8,7 +8,7 @@ main = do
   print $ simpleFunction 3
   print "End!"
 
-
+-- | The rewrite rule wraps all calls to `simpleFunction` with `offloadFunction`.
 {-# RULES
 "simpleFunction/offload simpleFunction" forall x.
     simpleFunction x = offloadFunction "simpleFunction" simpleFunction x

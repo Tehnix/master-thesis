@@ -16,6 +16,9 @@ binaries/
 .ghc-environment*
 cabal.project.local
 cabal.project.local~
+*.hi
+*.o
+FunctionMapping.txt
 
 ## User settings
 xcuserdata/

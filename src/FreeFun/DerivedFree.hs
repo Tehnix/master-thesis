@@ -1,23 +1,30 @@
-{-# LANGUAGE DeriveFunctor, TemplateHaskell, FlexibleContexts #-}
+{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE TemplateHaskell #-}
 module DerivedFree where
 
-import Control.Monad.State
 import Control.Monad.Free
 import Control.Monad.Free.TH
+import Control.Monad.State
 
 
+-- | The Effects model the possible operations we support. Because this is
+-- not a Generalized algebraic data type (GADT), we end up needing to
+-- pass around `next` (continuations).
 data Effects next
   = ReadFile String (String -> next)
   | WriteOutput String next
   | WriteOutputInt Int next
   | GetInput (String -> next)
   | Computation Int Int (Int -> next)
-  deriving (Functor)
+  deriving (Functor) -- Automatically derive our functor definitions.
 
+-- | Use Template Haskell to generate our function definitions.
 makeFree ''Effects
 
 type Program = Free Effects
 
+-- | A simple interpreter for our program.
 testInterpreter :: Program next -> IO next
 testInterpreter (Pure a) = return a
 testInterpreter (Free effect) =
@@ -31,20 +38,20 @@ testInterpreter (Free effect) =
       in testInterpreter $ next fakeInput
     Computation i1 i2 next -> testInterpreter $ next (i1 + i2)
 
+-- | A different interpreter that does not do any IO.
 pureStateInterpreter :: MonadState [String] m => Program next -> m next
 pureStateInterpreter (Pure a) = return a
 pureStateInterpreter (Free effect) =
   case effect of
-    ReadFile filename next -> do
+    ReadFile filename next ->
       let fakeFileContent = "Test file content for: " ++ filename
-      pureStateInterpreter $ next fakeFileContent
+      in pureStateInterpreter $ next fakeFileContent
     WriteOutput s next -> do
       modify $ flip (++) [s]
       pureStateInterpreter next
     WriteOutputInt i next -> do
       modify $ flip (++) [show i]
       pureStateInterpreter next
-    GetInput next -> do
-      let fakeInput = "Fake input"
-      pureStateInterpreter $ next fakeInput
+    GetInput next -> let fakeInput = "Fake input"
+      in pureStateInterpreter $ next fakeInput
     Computation i1 i2 next -> pureStateInterpreter $ next (i1 + i2)
