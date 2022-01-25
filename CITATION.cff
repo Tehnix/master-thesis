@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Kjaer Laustsen"
+  given-names: "Christian"
+title: "Exploring the use of purely functional programming languages for offloading of mobile computations"
+version: 1.0.0
+date-released: 2018-01-30
+url: "https://github.com/Tehnix/master-thesis"
